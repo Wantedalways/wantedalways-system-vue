@@ -1,7 +1,7 @@
 class storage {
 
   // 前缀
-  prefix: string = 'w_';
+  prefix: string = 'W_';
 
   // 保存
   set(key, value: string, expire: number) {
