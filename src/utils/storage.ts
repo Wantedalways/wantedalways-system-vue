@@ -4,7 +4,7 @@ class storage {
   prefix: string = 'W_';
 
   // 保存
-  set(key, value: string, expire: number) {
+  set(key: string, value: string, expire: number) {
     const valueString = JSON.stringify({
       value,
       expire: expire !== null ? new Date().getTime() + expire : null

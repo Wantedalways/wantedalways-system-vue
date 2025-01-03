@@ -1,6 +1,6 @@
 import request from "@/utils/request";
 
-export function get(url, params) {
+export function get(url: string, params?: unknown) {
     return request({
         url,
         method: 'get',
@@ -8,7 +8,7 @@ export function get(url, params) {
     })
 }
 
-export function post(url, data) {
+export function post(url: string, data?: unknown) {
     return request({
         url,
         method: 'post',
