@@ -7,10 +7,12 @@ html, body, #app {
 }
 
 html {
-  background: #EBEEF5 url(@/assets/image/background.svg) no-repeat;
-  background-size: cover;
+
 }
 
-a {
+a,
+a:focus,
+a:hover {
   text-decoration: none;
+  color: inherit;
 }

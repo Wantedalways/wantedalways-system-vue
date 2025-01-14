@@ -1,19 +1,20 @@
 <template>
-  <el-form class="account-form">
-    <el-form-item>
-      <el-input placeholder="用户账号/手机号" clearable :prefix-icon="User" size="large" />
+  <el-form class="account-form" :model="loginInfo" :rules="verifyRules" ref="loginForm">
+    <el-form-item prop="account">
+      <el-input placeholder="用户账号/手机号" clearable :prefix-icon="User" size="large" v-model="loginInfo.account" />
     </el-form-item>
-    <el-form-item>
-      <el-input placeholder="密码" clearable :prefix-icon="Key" size="large" />
+    <el-form-item prop="password">
+      <el-input placeholder="密码" type="password" show-password clearable :prefix-icon="Key" size="large" v-model="loginInfo.password" />
     </el-form-item>
     <el-row>
       <el-col :span="16">
-        <el-form-item>
-          <el-input placeholder="验证码" clearable :prefix-icon="Finished" size="large" />
+        <el-form-item prop="captcha">
+          <el-input placeholder="验证码" clearable :prefix-icon="Finished" size="large" v-model="loginInfo.captcha" />
         </el-form-item>
       </el-col>
       <el-col :span="7" :offset="1" class="captcha">
-        <el-image :src="getAssets('image/login-404.svg')" fit="contain" />
+        <el-image v-if="isCaptchaSuccess" :src="captchaImage" fit="contain" @click="handleCaptcha" />
+        <el-image v-else :src="getAssets('image/login-404.svg')" fit="contain" @click="handleCaptcha" />
       </el-col>
     </el-row>
     <el-form-item class="login-checkbox">
@@ -21,15 +22,136 @@
       <el-checkbox label="自动登录" size="large" />
     </el-form-item>
     <el-form-item>
-      <el-button type="primary" size="large" class="login-button">登录</el-button>
+      <el-button type="primary" size="large" class="login-button" @click="handleLogin" :loading="loading">登录</el-button>
     </el-form-item>
   </el-form>
 </template>
 
 <script setup lang="ts">
-
 import {Finished, Key, User} from "@element-plus/icons-vue";
 import {getAssets} from "@/utils";
+import {onMounted, reactive, ref} from "vue";
+import {getCaptcha} from "@/api/user";
+import {ElNotification, type FormRules} from "element-plus";
+import type {LoginModel} from "@/stores/modules/user/type";
+import useUserStore from "@/stores/modules/user";
+import {useRouter} from "vue-router";
+
+// 验证码
+const isCaptchaSuccess = ref(false)
+const captchaImage = ref('')
+let checkKey = ref('')
+
+// 处理验证码
+async function handleCaptcha() {
+  loginInfo.captcha = ''
+  checkKey.value = new Date().getTime().toString();
+  try {
+    const result = await getCaptcha(checkKey.value);
+    if (result.success) {
+      isCaptchaSuccess.value = true
+      captchaImage.value = result.data
+    } else {
+      isCaptchaSuccess.value = false
+      ElNotification.error({
+        title: '错误',
+        message: result.message
+      })
+    }
+  } catch (error) {
+    isCaptchaSuccess.value = false
+    ElNotification.error({
+      title: '错误',
+      message: (error as Error).message
+    })
+  }
+}
+
+interface LoginInfo {
+  account: string,
+  password: string,
+  captcha: string
+}
+// 登录表单
+const loginInfo = reactive<LoginInfo>({
+  account: '',
+  password: '',
+  captcha: ''
+})
+
+// 登录类型（0，用户名；1，手机号）
+enum LoginTypes {
+  username = 0,
+  phone = 1,
+}
+
+let loginType = ref(0)
+
+const usernameOrPhone = (rule: any, value: any, callback: any) => {
+  const regex = /^1[3-9]\d{9}$/;
+  if (regex.test(value)) {
+    loginType.value = LoginTypes.phone;
+  } else {
+    loginType.value = LoginTypes.username;
+  }
+  callback()
+}
+
+// 验证规则
+const verifyRules = reactive<FormRules<LoginInfo>>({
+  account: [
+    {required: true, message: '请输入用户账号或手机号', trigger: 'blur'},
+    {validator: usernameOrPhone}
+  ],
+  password: [
+    {required: true, message: '请输入密码', trigger: 'blur'}
+  ],
+  captcha: [
+    {required: true, message: '请输入验证码', trigger: 'blur'}
+  ]
+})
+
+const loginForm = ref()
+const loading = ref(false)
+const router = useRouter()
+
+function handleLogin() {
+  loginForm.value.validate(async (valid) => {
+    if (valid) {
+      loading.value = true
+
+      const loginModel: LoginModel = {
+        type: loginType.value,
+        account: loginInfo.account,
+        password: loginInfo.password,
+        captcha: loginInfo.captcha,
+        checkKey: checkKey.value
+      }
+
+      const userStore = useUserStore()
+      try {
+        await userStore.accountLogin(loginModel)
+
+        ElNotification.success({
+          title: '欢迎',
+          message: '登录成功'
+        })
+        await router.push('/')
+      } catch (error) {
+        loading.value = false
+        ElNotification.error({
+          title: '错误',
+          message: (error as Error).message
+      })
+        await handleCaptcha()
+      }
+    }
+  })
+}
+
+onMounted(() => {
+  handleCaptcha()
+})
 </script>
 
 <style scoped lang="scss">

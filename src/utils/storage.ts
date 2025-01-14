@@ -22,12 +22,10 @@ class storage {
 
     try {
       const {value, expire} = JSON.parse(jsonValue);
-
-      if (expire !== null || expire >= new Date().getTime()) {
+      if (expire !== null && expire >= new Date().getTime()) {
         return value
       }
-
-      this.remove(this.prefix + key);
+      this.remove(key);
       return null
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (e) {

@@ -15,3 +15,4 @@ export function post(url: string, data?: unknown) {
         data
     })
 }
+

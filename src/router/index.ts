@@ -9,12 +9,18 @@ const router = createRouter({
     {
       name: 'Home',
       path: '/',
-      component: BaseLayout
+      component: BaseLayout,
+      meta: {
+        title: '首页',
+      }
     },
     {
       name: 'Login',
       path: '/login',
-      component: LoginView
+      component: LoginView,
+      meta: {
+        title: '登录'
+      }
     }
   ]
 })

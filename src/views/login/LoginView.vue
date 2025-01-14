@@ -21,8 +21,8 @@
         </div>
       </div>
     </el-main>
-    <el-footer>
-      <el-link type="info" target="_blank">Copyright &copy; 2025 Wantedalways</el-link>
+    <el-footer class="footer">
+      <el-link type="info" target="_blank" :underline="false" class="link">Copyright &copy; 2025 Wantedalways</el-link>
     </el-footer>
   </el-container>
 </template>
@@ -33,12 +33,12 @@
 </script>
 
 <style scoped lang="scss">
-  $titleColor: #304156;
-
   .container {
     height: 100%;
     background-size: auto;
     justify-content: center;
+    background: #EBEEF5 url(@/assets/image/background.svg) no-repeat;
+    background-size: cover;
 
     .main {
       display: flex;
@@ -69,16 +69,24 @@
             bottom: 10px;
             font-weight: 600;
             font-size: 20px;
-            color: $titleColor;
+            color: $loginTitleColor;
           }
 
           .desc {
             font-size: 15px;
             font-weight: 300;
-            color: $titleColor;
+            color: $loginTitleColor;
             margin-top: 10px;
           }
         }
+      }
+    }
+
+    .footer {
+      text-align: center;
+
+      .link {
+        font-size: 12px;
       }
     }
   }
