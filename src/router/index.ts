@@ -1,30 +1,50 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import LoginView from "@/views/login/LoginView.vue";
-import createRouterGuard from "@/router/guard";
-import BaseLayout from "@/layout/BaseLayout.vue";
+import setupPermissionGuard from "@/router/guard/permission";
+
+export const constantRoutes = [
+  {
+    name: 'Login',
+    path: '/login',
+    component: LoginView,
+    hidden: true,
+    meta: {
+      title: '登录'
+    }
+  },
+  {
+    path: '/404',
+    component: () => import('@/views/exception/Page404View.vue'),
+    meta: {
+      title: '404'
+    }
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: '/404',
+    hidden: true,
+  }
+]
+
+export const baseRoutes = [
+  {
+    path: '/redirect',
+    component: () => import('@/layout/BlankLayout.vue'),
+    hidden: true,
+    children: [
+      {
+        path: '/redirect/:path(.*)',
+        component: () => import('@/layout/Redirect.vue')
+      }
+    ]
+  }
+]
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [
-    {
-      name: 'Home',
-      path: '/',
-      component: BaseLayout,
-      meta: {
-        title: '首页',
-      }
-    },
-    {
-      name: 'Login',
-      path: '/login',
-      component: LoginView,
-      meta: {
-        title: '登录'
-      }
-    }
-  ]
+  routes: constantRoutes
 })
 
-createRouterGuard(router)
+setupPermissionGuard(router)
 
 export default router

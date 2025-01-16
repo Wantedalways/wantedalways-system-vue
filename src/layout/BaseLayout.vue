@@ -13,7 +13,7 @@
             <header-tag />
           </el-header>
           <el-main class="content">
-            <h1>主体</h1>
+            <app-main />
           </el-main>
         </el-container>
       </el-container>
@@ -26,6 +26,7 @@
 import SideBar from "@/layout/sidebar/SideBar.vue";
 import NavBar from "@/layout/navbar/NavBar.vue";
 import HeaderTag from "@/layout/tag/HeaderTag.vue";
+import AppMain from "@/layout/main/AppMain.vue";
 </script>
 
 <style scoped lang="scss">

@@ -1,5 +1,5 @@
 <template>
-  <el-form class="account-form" :model="loginInfo" :rules="verifyRules" ref="loginForm">
+  <el-form class="account-form" :model="loginInfo" :rules="verifyRules" ref="loginForm" @keyup.enter="handleLogin">
     <el-form-item prop="account">
       <el-input placeholder="用户账号/手机号" clearable :prefix-icon="User" size="large" v-model="loginInfo.account" />
     </el-form-item>
@@ -17,10 +17,10 @@
         <el-image v-else :src="getAssets('image/login-404.svg')" fit="contain" @click="handleCaptcha" />
       </el-col>
     </el-row>
-    <el-form-item class="login-checkbox">
+<!--    <el-form-item class="login-checkbox">
       <el-checkbox label="记住密码" size="large" />
       <el-checkbox label="自动登录" size="large" />
-    </el-form-item>
+    </el-form-item>-->
     <el-form-item>
       <el-button type="primary" size="large" class="login-button" @click="handleLogin" :loading="loading">登录</el-button>
     </el-form-item>
@@ -33,9 +33,11 @@ import {getAssets} from "@/utils";
 import {onMounted, reactive, ref} from "vue";
 import {getCaptcha} from "@/api/user";
 import {ElNotification, type FormRules} from "element-plus";
-import type {LoginModel} from "@/stores/modules/user/type";
+import type {LoginModel} from "@/stores/type";
 import useUserStore from "@/stores/modules/user";
 import {useRouter} from "vue-router";
+import storage from "@/utils/storage";
+import {USER_ACCOUNT} from "@/constant/cache";
 
 // 验证码
 const isCaptchaSuccess = ref(false)
@@ -54,16 +56,13 @@ async function handleCaptcha() {
     } else {
       isCaptchaSuccess.value = false
       ElNotification.error({
-        title: '错误',
+        title: '系统提示',
         message: result.message
       })
     }
   } catch (error) {
     isCaptchaSuccess.value = false
-    ElNotification.error({
-      title: '错误',
-      message: (error as Error).message
-    })
+    console.log(error)
   }
 }
 
@@ -85,7 +84,7 @@ enum LoginTypes {
   phone = 1,
 }
 
-let loginType = ref(0)
+const loginType = ref(0)
 
 const usernameOrPhone = (rule: any, value: any, callback: any) => {
   const regex = /^1[3-9]\d{9}$/;
@@ -118,6 +117,7 @@ const router = useRouter()
 function handleLogin() {
   loginForm.value.validate(async (valid) => {
     if (valid) {
+      storage.set(USER_ACCOUNT, loginInfo.account)
       loading.value = true
 
       const loginModel: LoginModel = {
@@ -140,9 +140,10 @@ function handleLogin() {
       } catch (error) {
         loading.value = false
         ElNotification.error({
-          title: '错误',
-          message: (error as Error).message
-      })
+          title: '系统提示',
+          message: error.message
+        })
+
         await handleCaptcha()
       }
     }
@@ -150,7 +151,10 @@ function handleLogin() {
 }
 
 onMounted(() => {
+  // 获取验证码
   handleCaptcha()
+  // 填充登录信息
+  loginInfo.account = storage.get(USER_ACCOUNT) as string
 })
 </script>
 
@@ -158,9 +162,11 @@ onMounted(() => {
   .account-form {
     .captcha {
       padding: 3px;
+      cursor: pointer;
     }
 
     .login-button {
+      margin-top: 25px;
       width: 100%;
     }
   }
