@@ -6,10 +6,10 @@
             <el-image :src="getAssets('image/logo.png')" class="logo" />
           </a>
         </div>
+        <div class="breadcrumb">
+          <nav-breadcrumb />
+        </div>
         <div class="content">
-          <div class="breadcrumb">
-            <nav-breadcrumb />
-          </div>
           <div class="theme-switch">
             <theme-switch />
           </div>
@@ -47,6 +47,7 @@ import NavBreadcrumb from "@/layout/navbar/NavBreadcrumb.vue";
         display: flex;
         align-items: center;
         height: $navbarHeight;
+        width: $sidebarWidth;
 
         .logo-link {
           height: 28px;
@@ -58,16 +59,15 @@ import NavBreadcrumb from "@/layout/navbar/NavBreadcrumb.vue";
         }
       }
 
+      .breadcrumb {
+        height: $navbarHeight;
+        flex-grow: 1;
+      }
+
       .content {
-        width: 100%;
         display: flex;
         justify-content: flex-end;
         align-items: center;
-
-        .breadcrumb {
-          height: $navbarHeight;
-          flex-grow: 1;
-        }
 
         .theme-switch, .profile {
           display: flex;

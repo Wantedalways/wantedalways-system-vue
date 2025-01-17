@@ -1,5 +1,6 @@
 import {type Router} from 'vue-router'
 import NProgress from 'nprogress'
+import 'nprogress/nprogress.css'
 import {KEY_TOKEN} from "@/constant/cache";
 import storage from "@/utils/storage";
 import usePermissionStore from "@/stores/modules/permission";
@@ -42,7 +43,7 @@ export default function setupPermissionGuard(router: Router) {
           } catch (error) {
             ElNotification.error({
               title: '系统提示',
-              message: error.message
+              message: (error as Error).message
             })
             const userStore = useUserStore()
             await userStore.logout()

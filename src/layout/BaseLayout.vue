@@ -44,8 +44,8 @@ import AppMain from "@/layout/main/AppMain.vue";
     }
 
     .sidebar {
-      width: 200px;
-      padding: 20px 32px;
+      width: $sidebarWidth;
+      padding: 20px 0 20px 32px;
     }
 
     .tags {
