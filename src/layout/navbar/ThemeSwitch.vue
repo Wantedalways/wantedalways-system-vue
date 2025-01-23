@@ -9,10 +9,10 @@
 </template>
 
 <script setup lang="ts">
-  import {ref} from "vue";
-  import {Sunny} from "@element-plus/icons-vue";
+import {ref} from "vue";
+import {Sunny} from "@element-plus/icons-vue";
 
-  const theme = ref(false)
+const theme = ref(false)
 </script>
 
 <style scoped lang="scss">

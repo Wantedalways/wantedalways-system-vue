@@ -46,14 +46,19 @@ import AppMain from "@/layout/main/AppMain.vue";
     .sidebar {
       width: $sidebarWidth;
       padding: 20px 0 20px 32px;
+      min-width: $sidebarWidth;
     }
 
-    .tags {
-      height: 40px;
-      padding: 0;
-      margin-right: 15px;
-      border-bottom: 1px solid var(--el-menu-border-color);
+    .app-content {
+
+      .tags {
+        height: 34px;
+        padding: 0 10px;
+        border-bottom: 1px solid #d8dce5;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .12), 0 0 3px 0 rgba(0, 0, 0, .04);
+      }
     }
+
   }
 }
 

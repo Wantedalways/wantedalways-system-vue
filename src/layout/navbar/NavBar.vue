@@ -48,6 +48,8 @@ import NavBreadcrumb from "@/layout/navbar/NavBreadcrumb.vue";
         align-items: center;
         height: $navbarHeight;
         width: $sidebarWidth;
+        min-width: $sidebarWidth;
+
 
         .logo-link {
           height: 28px;

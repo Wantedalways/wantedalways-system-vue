@@ -1,7 +1,7 @@
 import axios from "axios";
 import storage from "@/utils/storage";
 import {KEY_TOKEN} from "@/constant/cache";
-import {ElNotification, ElMessageBox} from 'element-plus'
+import {ElMessageBox, ElNotification} from 'element-plus'
 import useUserStore from "@/stores/modules/user";
 
 // axios实例

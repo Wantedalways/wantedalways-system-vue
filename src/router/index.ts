@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import {createRouter, createWebHistory} from 'vue-router'
 import LoginView from "@/views/login/LoginView.vue";
 import setupPermissionGuard from "@/router/guard/permission";
 
@@ -27,17 +27,7 @@ export const constantRoutes = [
 ]
 
 export const baseRoutes = [
-  {
-    path: '/redirect',
-    component: () => import('@/layout/BlankLayout.vue'),
-    hidden: true,
-    children: [
-      {
-        path: '/redirect/:path(.*)',
-        component: () => import('@/layout/Redirect.vue')
-      }
-    ]
-  }
+
 ]
 
 const router = createRouter({

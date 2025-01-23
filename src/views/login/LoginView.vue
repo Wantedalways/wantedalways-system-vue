@@ -28,8 +28,8 @@
 </template>
 
 <script setup lang="ts">
-  import {getAssets} from "@/utils";
-  import AccountLogin from "@/views/login/AccountLogin.vue";
+import {getAssets} from "@/utils";
+import AccountLogin from "@/views/login/AccountLogin.vue";
 </script>
 
 <style scoped lang="scss">

@@ -1,5 +1,6 @@
 import {get, post} from "@/api/index";
 import type {LoginModel} from "@/stores/type";
+
 enum Api {
   // 获取验证码
   getCaptcha = '/sys/login/getCaptcha',

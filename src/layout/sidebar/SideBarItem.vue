@@ -1,6 +1,6 @@
 <template>
   <div v-show="!item.hidden">
-    <el-menu-item v-if="!hasChildren(item)" :index="item.path" @click="goRoute(item.path)">
+    <el-menu-item v-if="!hasChildren(item)" :index="item.path">
       {{item.meta.title}}
     </el-menu-item>
     <el-sub-menu v-else :index="item.path">
@@ -13,8 +13,6 @@
 </template>
 
 <script setup lang="ts">
-import {useRouter} from "vue-router";
-
 defineProps(['item'])
 
 function hasChildren(item: any) {
@@ -25,12 +23,6 @@ function hasChildren(item: any) {
     return routeChild.length > 0;
   }
   return false
-}
-
-const router = useRouter()
-
-function goRoute(path: string) {
-  router.push(path);
 }
 </script>
 
