@@ -10,7 +10,7 @@
           <nav-breadcrumb />
         </div>
         <div class="content">
-          <div class="theme-switch">
+          <div class="theme-switch" v-show="false">
             <theme-switch />
           </div>
           <div class="profile">
@@ -32,11 +32,11 @@ import NavBreadcrumb from "@/layout/navbar/NavBreadcrumb.vue";
 <style scoped lang="scss">
   .navbar-wrapper {
     height: $navbarHeight;
-    padding: 0 32px;
+    padding: 0 20px;
     border-bottom: 1px solid #dcdfe6;
-    background-image: radial-gradient(transparent 1px, #ffffff 1px);
+    /*background-image: radial-gradient(transparent 1px, #ffffff 1px);
     background-size: 4px 4px;
-    backdrop-filter: saturate(50%) blur(4px);
+    backdrop-filter: saturate(50%) blur(4px);*/
 
     .navbar-container {
       display: flex;
@@ -50,9 +50,9 @@ import NavBreadcrumb from "@/layout/navbar/NavBreadcrumb.vue";
         width: $sidebarWidth;
         min-width: $sidebarWidth;
 
-
         .logo-link {
           height: 28px;
+          margin-left: 20px;
 
           .logo {
             position: relative;

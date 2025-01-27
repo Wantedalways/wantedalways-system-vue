@@ -218,7 +218,7 @@ import {ElScrollbar} from "element-plus";
       const preTag = tags.value[targetIndex - 1]
       const nextTag = tags.value[targetIndex + 1]
 
-      const tagSpacing = 3
+      const tagSpacing = 5
       const beforePreTagOffsetLeft = preTag.$el.offsetLeft - tagSpacing
       const afterNextTagOffsetLeft = nextTag.$el.offsetLeft + nextTag.$el.offsetWidth + tagSpacing
       if (afterNextTagOffsetLeft > wrap.scrollLeft + containerWidth) {
@@ -234,7 +234,7 @@ import {ElScrollbar} from "element-plus";
    */
   function scrollToCurrentTag() {
     nextTick(() => {
-      for (let tagItem of tags.value) {
+      for (const tagItem of tags.value) {
         const to = tagItem.$attrs.tagData
         if (to.path === route.path) {
           scrollToTarget(tagItem)
@@ -280,7 +280,7 @@ import {ElScrollbar} from "element-plus";
       padding-top: 4px;
 
       .tag-item {
-        margin-right: 3px;
+        margin-right: 5px;
         height: 26px;
         cursor: pointer;
 

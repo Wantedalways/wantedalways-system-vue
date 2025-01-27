@@ -5,3 +5,5 @@ export interface LoginModel {
   captcha: string,
   checkKey: string,
 }
+
+

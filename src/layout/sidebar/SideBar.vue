@@ -20,10 +20,18 @@ const route = useRoute()
 
 <style scoped lang="scss">
   .sidebar-wrapper {
-    border-right: 1px solid var(--el-menu-border-color);
 
     .sidebar-container {
       border: none;
+    }
+  }
+</style>
+
+<style lang="scss">
+  .sidebar-container {
+
+    .el-menu-item.is-active  {
+        font-weight: 600;
     }
   }
 </style>

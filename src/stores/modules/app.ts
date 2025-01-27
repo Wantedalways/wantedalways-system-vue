@@ -82,7 +82,7 @@ const useAppStore = defineStore('app', {
      * 更新标签
      */
     updateVisitedTag(tag) {
-      for (let t of this.visitedTags) {
+      for (const t of this.visitedTags) {
         if (t.path === tag.path) {
           Object.assign(t, tag)
           break

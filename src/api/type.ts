@@ -6,3 +6,12 @@ export interface Result {
   data: string,
   timestamp: number
 }
+
+// 角色查询参数
+export interface RoleQueryParams {
+  roleType: string,
+  roleName: string,
+  pageNo: number,
+  pageSize: number,
+}
+

@@ -10,9 +10,21 @@ html {
 
 }
 
+body {
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Arial, sans-serif;
+}
+
 a,
 a:focus,
 a:hover {
   text-decoration: none;
   color: inherit;
+}
+
+// 取消下拉元素聚焦时边框
+.el-tooltip__trigger:focus-visible {
+  outline: unset !important;
 }

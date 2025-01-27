@@ -42,7 +42,7 @@ import {USER_ACCOUNT} from "@/constant/cache";
 // 验证码
 const isCaptchaSuccess = ref(false)
 const captchaImage = ref('')
-let checkKey = ref('')
+const checkKey = ref('')
 
 // 处理验证码
 async function handleCaptcha() {
@@ -86,7 +86,7 @@ enum LoginTypes {
 
 const loginType = ref(0)
 
-const usernameOrPhone = (rule: any, value: any, callback: any) => {
+const usernameOrPhone = (rule: unknown, value: string, callback: (res?: Error) => void) => {
   const regex = /^1[3-9]\d{9}$/;
   if (regex.test(value)) {
     loginType.value = LoginTypes.phone;

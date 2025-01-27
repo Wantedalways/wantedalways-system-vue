@@ -43,6 +43,10 @@ request.interceptors.response.use(response => {
               window.location.reload()
             }, 1500)
           })
+        } else {
+          setTimeout(() => {
+            window.location.reload()
+          }, 1500)
         }
         break
       case 403:

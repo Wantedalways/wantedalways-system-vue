@@ -6,5 +6,6 @@ export const KEY_TOKEN = 'Token_'
 export const USER_INFO = 'User_Info_'
 // 数据字典
 export const DATA_DICT = 'Data_Dict_'
+export const DICT_ROLE_TYPE = 'role_type'
 // 登陆记录用户账号或手机号
 export const USER_ACCOUNT = 'User_Account'

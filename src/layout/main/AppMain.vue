@@ -1,5 +1,5 @@
 <template>
-  <router-view v-slot="{ Component, route }">
+  <router-view v-slot="{ Component, route }" class="main-container">
     <transition>
       <keep-alive :include="cached">
         <Component :is="Component" v-if="flag" :key="route.name" />
@@ -27,5 +27,7 @@ watch(() => appStore.refreshFlag, () => {
 </script>
 
 <style scoped lang="scss">
-
+  .main-container {
+    height: 100%;
+  }
 </style>

@@ -1,11 +1,17 @@
 <template>
   <div v-show="!item.hidden">
     <el-menu-item v-if="!hasChildren(item)" :index="item.path">
-      {{item.meta.title}}
+      <el-icon v-if="item.meta.icon">
+        <component :is="item.meta.icon" />
+      </el-icon>
+      <span :class="{'blank-icon': !item.meta.icon}">{{item.meta.title}}</span>
     </el-menu-item>
     <el-sub-menu v-else :index="item.path">
       <template #title>
-        {{item.meta.title}}
+        <el-icon v-if="item.meta.icon">
+          <component :is="item.meta.icon" />
+        </el-icon>
+        <span>{{item.meta.title}}</span>
       </template>
       <side-bar-item v-for="child in item.children" :key="child.path" :item="child" />
     </el-sub-menu>
@@ -27,5 +33,9 @@ function hasChildren(item: any) {
 </script>
 
 <style scoped lang="scss">
-
+  .blank-icon {
+    margin-left: 10px;
+  }
 </style>
+
+
