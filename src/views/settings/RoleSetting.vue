@@ -3,7 +3,7 @@
     <el-row class="role-query-wrapper">
       <el-form inline @keyup.enter="queryRoleList" :model="roleQueryParams">
         <el-form-item label="角色类型">
-          <el-select v-model="roleQueryParams.roleType" style="width: 160px" clearable placeholder="角色类型" @change="queryRoleList">
+          <el-select v-model="roleQueryParams.roleType" style="width: 160px" clearable placeholder="请选择" @change="queryRoleList">
             <el-option v-for="type in roleType" :key="type.value" :label="type.text" :value="type.value" />
           </el-select>
         </el-form-item>
@@ -56,7 +56,7 @@
               <template #dropdown>
                 <el-dropdown-menu>
                   <el-dropdown-item>
-                    <el-button size="small" text type="primary">修改</el-button>
+                    <el-button size="small" text type="primary" @click="openEditDialog(scope.row)">修改</el-button>
                   </el-dropdown-item>
                   <el-dropdown-item>
                     <el-button size="small" text type="danger">删除</el-button>
@@ -72,53 +72,94 @@
       分页
     </div>
   </div>
-  <el-dialog v-model="addDialogVisible" title="新建角色">
-    <el-form :model="roleAddParams">
-      <el-form-item label="角色类型">
-        <el-select v-model="roleAddParams.roleType" clearable placeholder="角色类型">
+  <el-dialog v-model="addDialogVisible" title="新建角色" class="role-dialog" :show-close="false" @open="queryRoleSelectList">
+    <el-form :model="roleAddParams" :rules="addRoleRules" hide-required-asterisk ref="addRoleForm" class="role-form">
+      <el-form-item label="角色类型" prop="roleType" class="role-form-item">
+        <el-select
+          v-model="roleAddParams.roleType"
+          clearable placeholder="请选择"
+          @change="queryRoleSelectList(roleAddParams.roleType)"
+        >
           <el-option v-for="type in roleType" :key="type.value" :label="type.text" :value="type.value" />
         </el-select>
       </el-form-item>
-      <el-form-item label="角色名称">
-        <el-input v-model="roleAddParams.roleName" clearable placeholder="角色名称" />
+      <el-form-item label="角色名称" prop="roleName" class="role-form-item">
+        <el-input v-model="roleAddParams.roleName" clearable placeholder="请输入" />
       </el-form-item>
-      <el-form-item label="角色编码">
-        <el-input v-model="roleAddParams.roleCode" clearable placeholder="角色编码" />
+      <el-form-item label="角色编码" prop="roleCode" class="role-form-item">
+        <el-input v-model="roleAddParams.roleCode" clearable placeholder="请输入" />
       </el-form-item>
-      <el-form-item label="上级角色">
-        <el-select v-model="roleAddParams.parentId" placeholder="上级角色">
-
+      <el-form-item label="上级角色" prop="parentId" class="role-form-item">
+        <el-select v-model="roleAddParams.parentId" placeholder="请选择">
+          <el-option v-for="role in roleSelectList" :key="role.id" :label="role.roleName" :value="role.id"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="角色描述">
-        <el-input v-model="roleAddParams.description" clearable placeholder="角色描述" />
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary">确认</el-button>
-        <el-button>取消</el-button>
+      <el-form-item label="角色描述" prop="description" class="role-form-item">
+        <el-input v-model="roleAddParams.description" clearable placeholder="请简要描述" />
       </el-form-item>
     </el-form>
+    <template #footer>
+      <el-button type="primary" @click="handleAddRole" class="role-modify-button">确认</el-button>
+      <el-button @click="addDialogVisible = false" class="role-modify-button">取消</el-button>
+    </template>
+  </el-dialog>
+  <el-dialog v-model="editDialogVisible" title="修改角色" class="role-dialog" :show-close="false" @open="queryRoleSelectList">
+    <el-form :model="roleEditParams" :rules="addRoleRules" hide-required-asterisk ref="editRoleForm" class="role-form">
+      <el-form-item label="角色类型" prop="roleType" class="role-form-item">
+        <el-select
+          v-model="roleEditParams.roleType"
+          clearable placeholder="请选择"
+          @change="queryRoleSelectList(roleEditParams.roleType)"
+        >
+          <el-option v-for="type in roleType" :key="type.value" :label="type.text" :value="type.value" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="角色名称" prop="roleName" class="role-form-item">
+        <el-input v-model="roleEditParams.roleName" clearable placeholder="请输入" />
+      </el-form-item>
+      <el-form-item label="角色编码" prop="roleCode" class="role-form-item">
+        <el-input v-model="roleEditParams.roleCode" clearable placeholder="请输入" />
+      </el-form-item>
+      <el-form-item label="上级角色" prop="parentId" class="role-form-item">
+        <el-select v-model="roleEditParams.parentId" placeholder="请选择">
+          <el-option v-for="role in roleSelectList" :key="role.id" :label="role.roleName" :value="role.id"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="角色描述" prop="description" class="role-form-item">
+        <el-input v-model="roleEditParams.description" clearable placeholder="请简要描述" />
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <el-button type="primary" @click="handleAddRole" class="role-modify-button">确认</el-button>
+      <el-button @click="addDialogVisible = false" class="role-modify-button">取消</el-button>
+    </template>
   </el-dialog>
 </template>
 
 <script setup lang="ts">
-import {computed, onMounted, reactive, ref} from "vue";
+import {computed, onMounted, reactive, ref, watch} from "vue";
 import {getDict} from "@/utils";
 import {DICT_ROLE_TYPE} from "@/constant/cache";
 import {ArrowDown, Plus, Refresh, Search} from "@element-plus/icons-vue";
-import {getRoleList} from "@/api/setting";
-import {ElMessage} from "element-plus";
+import {addRole, getRoleList, getRoleSelectList, validateRole} from "@/api/setting";
+import {ElMessage, type FormRules} from "element-plus";
+import type {Role} from "@/api/type";
 
+// 角色类型
 const roleType = computed(() => getDict(DICT_ROLE_TYPE))
+// 角色查询参数
 const roleQueryParams = reactive({
   roleType: '',
   roleName: '',
   pageNo: 1,
-  pageSize: 10,
+  pageSize: 10
 })
 
 const roleLoading = ref(false)
 const roleResult = reactive({})
+/**
+ * 查询角色列表
+ */
 async function queryRoleList() {
   roleLoading.value = true
   try {
@@ -138,8 +179,107 @@ const roleAddParams = reactive({
   roleName: '',
   parentId: '',
   roleCode: '',
-  description : '',
+  description : ''
 })
+
+const roleSelectList = ref([])
+
+/**
+ * 查询角色下拉列表
+ * @param roleType
+ */
+async function queryRoleSelectList(roleType?: string) {
+  const {data} = await getRoleSelectList(roleType === undefined ? '0' : roleType)
+  roleSelectList.value = data
+}
+
+/**
+ * 角色名校验
+ */
+const validateRoleName = async (rule: any, value: any, callback: any) => {
+  if (value === '') {
+    callback(new Error('请输入角色名称'));
+  } else {
+    const result = await validateRole(value, 'roleName');
+    if (!result.success) {
+      callback(new Error(result.message));
+    } else {
+      callback();
+    }
+  }
+}
+
+/**
+ * 角色名校验
+ */
+const validateRoleCode = async (rule: any, value: any, callback: any) => {
+  if (value === '') {
+    callback(new Error('请输入角色编码'));
+  } else {
+    const result = await validateRole(value, 'roleCode');
+    if (!result.success) {
+      callback(new Error(result.message));
+    } else {
+      callback();
+    }
+  }
+}
+
+const addRoleRules = reactive<FormRules<Role>>({
+  roleType: [{required: true, message: '请选择角色类型', trigger: 'blur'}],
+  roleName: [{validator: validateRoleName, trigger: 'blur'}],
+  roleCode: [{validator: validateRoleCode, trigger: 'blur'}],
+  description: [{required: true, message: '请输入角色描述', trigger: 'blur'}]
+})
+
+const addRoleForm = ref()
+
+/**
+ * 新增角色
+ */
+function handleAddRole() {
+  addRoleForm.value.validate(async (valid) => {
+    if (valid) {
+      const result = await addRole(roleAddParams)
+      if (result.success) {
+        ElMessage.success(result.message)
+        await queryRoleList()
+        addDialogVisible.value = false
+      } else {
+        ElMessage.error(result.message)
+      }
+    }
+  })
+}
+
+watch(addDialogVisible, (value) => {
+  if (!value) {
+    addRoleForm.value.resetFields()
+  }
+})
+
+const editDialogVisible = ref(false)
+const editRoleForm = ref()
+watch(editDialogVisible, (value) => {
+  if (!value) {
+    editRoleForm.value.resetFields()
+  }
+})
+const roleEditParams = reactive({
+  roleType: '',
+  roleName: '',
+  parentId: '',
+  roleCode: '',
+  description: '',
+})
+function openEditDialog(row) {
+  roleEditParams.roleType = row.roleType
+  roleEditParams.roleName = row.roleName
+  roleEditParams.parentId = row.parentId
+  roleEditParams.roleCode = row.roleCode
+  roleEditParams.description = row.description
+  editDialogVisible.value = true
+}
 
 onMounted(() => {
   queryRoleList()
@@ -148,7 +288,7 @@ onMounted(() => {
 
 <script lang="ts">
 export default {
-  name: "roleSetting",
+  name: "RoleSetting",
 }
 </script>
 
@@ -185,5 +325,28 @@ export default {
 
 .button-more {
   margin-left: 12px;
+}
+
+.role-form {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  padding-top: 20px;
+
+  .role-form-item {
+    width: 310px;
+    margin-bottom: 30px;
+  }
+}
+
+.role-modify-button {
+  width: 100px;
+}
+</style>
+
+<style lang="scss">
+.role-dialog {
+  width: 700px;
+  padding: 26px;
 }
 </style>

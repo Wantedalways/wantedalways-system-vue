@@ -33,7 +33,7 @@ function isHome(route) {
   if (!routeName) {
     return false;
   }
-  return routeName.trim() === 'homeView'
+  return routeName.trim() === 'HomeView'
 }
 
 function handleLink(item) {

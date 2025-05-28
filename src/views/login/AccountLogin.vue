@@ -44,7 +44,9 @@ const isCaptchaSuccess = ref(false)
 const captchaImage = ref('')
 const checkKey = ref('')
 
-// 处理验证码
+/**
+ * 处理验证码
+ */
 async function handleCaptcha() {
   loginInfo.captcha = ''
   checkKey.value = new Date().getTime().toString();
@@ -86,6 +88,9 @@ enum LoginTypes {
 
 const loginType = ref(0)
 
+/**
+ * 判断用户账号或手机号
+ */
 const usernameOrPhone = (rule: unknown, value: string, callback: (res?: Error) => void) => {
   const regex = /^1[3-9]\d{9}$/;
   if (regex.test(value)) {
@@ -114,6 +119,9 @@ const loginForm = ref()
 const loading = ref(false)
 const router = useRouter()
 
+/**
+ * 处理登录
+ */
 function handleLogin() {
   loginForm.value.validate(async (valid) => {
     if (valid) {
@@ -141,7 +149,7 @@ function handleLogin() {
         loading.value = false
         ElNotification.error({
           title: '系统提示',
-          message: error.message
+          message:(error as Error).message
         })
 
         await handleCaptcha()
