@@ -12,7 +12,7 @@
         </el-form-item>
         <el-form-item>
           <el-button type="primary" :icon="Search" @click="queryRoleList">搜索</el-button>
-          <el-button :icon="Refresh">刷新</el-button>
+          <el-button :icon="Refresh" @click="handleRefresh">刷新</el-button>
         </el-form-item>
       </el-form>
     </el-row>
@@ -29,19 +29,21 @@
         :header-cell-style="{'text-align': 'center'}"
         :cell-style="{'text-align': 'center'}"
         class="role-table"
+        @sort-change="handleSort"
+        ref="roleTable"
       >
 <!--        <el-table-column type="index" label="序号" :index='index' />-->
-        <el-table-column prop="roleType_dictText" label="类型" />
-        <el-table-column prop="roleName" label="名称" />
-        <el-table-column prop="roleCode" label="编码" />
+        <el-table-column prop="roleType_dictText" label="类型" sortable="custom" />
+        <el-table-column prop="roleName" label="名称" sortable="custom" />
+        <el-table-column prop="roleCode" label="编码" sortable="custom" />
         <el-table-column prop="description" label="描述" />
         <el-table-column label="上级角色">
           <template #default="scope">
             {{scope.row.parentId_dictText ? scope.row.parentId_dictText : '/'}}
           </template>
         </el-table-column>
-        <el-table-column prop="createBy_dictText" label="创建人" />
-        <el-table-column prop="createTime" label="创建时间" />
+        <el-table-column prop="createBy_dictText" label="创建人" sortable="custom" />
+        <el-table-column prop="createTime" label="创建时间" sortable="custom" />
         <el-table-column label="操作">
           <template #default="scope">
             <el-button size="small" text type="primary">用户</el-button>
@@ -152,7 +154,9 @@ const roleQueryParams = reactive({
   roleType: '',
   roleName: '',
   pageNo: 1,
-  pageSize: 10
+  pageSize: 10,
+  orderBy: '',
+  order: ''
 })
 
 const roleLoading = ref(false)
@@ -340,6 +344,38 @@ function handleDeleteRole(id: string, roleName: string) {
       ElMessage.error(result.message)
     }
   }).catch(() => {})
+}
+
+/**
+ * 表格排序
+ */
+function handleSort(data: any[]) {
+  const orderBy = data.prop
+  if (orderBy.indexOf('_dictText') !== -1) {
+    roleQueryParams.orderBy = orderBy.substring(0, orderBy.indexOf('_dictText'))
+  } else {
+    roleQueryParams.orderBy = orderBy
+  }
+  roleQueryParams.order = data.order === 'descending' ? 'desc' : 'asc'
+
+  queryRoleList()
+}
+
+const roleTable = ref()
+/**
+ * 刷新查询
+ */
+function handleRefresh() {
+  roleQueryParams.roleType = ''
+  roleQueryParams.roleName = ''
+  roleQueryParams.pageNo = 1
+  roleQueryParams.pageSize = 10
+  roleQueryParams.orderBy = ''
+  roleQueryParams.order = ''
+
+  // 清空排序
+  roleTable.value.clearSort()
+  queryRoleList()
 }
 
 onMounted(() => {

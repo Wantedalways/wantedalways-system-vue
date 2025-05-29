@@ -13,6 +13,8 @@ export interface RoleQueryParams {
   roleName: string,
   pageNo: number,
   pageSize: number,
+  orderBy: string,
+  order: string
 }
 
 // 角色添加和修改
