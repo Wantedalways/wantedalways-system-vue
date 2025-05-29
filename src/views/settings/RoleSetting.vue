@@ -24,7 +24,7 @@
         v-loading="roleLoading"
         :data="roleResult.records"
         stripe
-        border
+        highlight-current-row
         table-layout="auto"
         :header-cell-style="{'text-align': 'center'}"
         :cell-style="{'text-align': 'center'}"
@@ -59,7 +59,7 @@
                     <el-button size="small" text type="primary" @click="openEditDialog(scope.row)">修改</el-button>
                   </el-dropdown-item>
                   <el-dropdown-item>
-                    <el-button size="small" text type="danger">删除</el-button>
+                    <el-button size="small" text type="danger" @click="handleDeleteRole(scope.row.id, scope.row.roleName)">删除</el-button>
                   </el-dropdown-item>
                 </el-dropdown-menu>
               </template>
@@ -73,7 +73,7 @@
     </div>
   </div>
   <el-dialog v-model="addDialogVisible" title="新建角色" class="role-dialog" :show-close="false" @open="queryRoleSelectList">
-    <el-form :model="roleAddParams" :rules="addRoleRules" hide-required-asterisk ref="addRoleForm" class="role-form">
+    <el-form :model="roleAddParams" :rules="roleRules" hide-required-asterisk ref="addRoleForm" class="role-form">
       <el-form-item label="角色类型" prop="roleType" class="role-form-item">
         <el-select
           v-model="roleAddParams.roleType"
@@ -103,8 +103,8 @@
       <el-button @click="addDialogVisible = false" class="role-modify-button">取消</el-button>
     </template>
   </el-dialog>
-  <el-dialog v-model="editDialogVisible" title="修改角色" class="role-dialog" :show-close="false" @open="queryRoleSelectList">
-    <el-form :model="roleEditParams" :rules="addRoleRules" hide-required-asterisk ref="editRoleForm" class="role-form">
+  <el-dialog v-model="editDialogVisible" title="修改角色" class="role-dialog" :show-close="false" @open="queryRoleSelectList" @close="clearCache">
+    <el-form :model="roleEditParams" :rules="roleRules" hide-required-asterisk ref="editRoleForm" class="role-form">
       <el-form-item label="角色类型" prop="roleType" class="role-form-item">
         <el-select
           v-model="roleEditParams.roleType"
@@ -130,8 +130,8 @@
       </el-form-item>
     </el-form>
     <template #footer>
-      <el-button type="primary" @click="handleAddRole" class="role-modify-button">确认</el-button>
-      <el-button @click="addDialogVisible = false" class="role-modify-button">取消</el-button>
+      <el-button type="primary" @click="handleEditRole" class="role-modify-button">确认</el-button>
+      <el-button @click="editDialogVisible = false" class="role-modify-button">取消</el-button>
     </template>
   </el-dialog>
 </template>
@@ -141,8 +141,8 @@ import {computed, onMounted, reactive, ref, watch} from "vue";
 import {getDict} from "@/utils";
 import {DICT_ROLE_TYPE} from "@/constant/cache";
 import {ArrowDown, Plus, Refresh, Search} from "@element-plus/icons-vue";
-import {addRole, getRoleList, getRoleSelectList, validateRole} from "@/api/setting";
-import {ElMessage, type FormRules} from "element-plus";
+import {addRole, deleteRole, editRole, getRoleList, getRoleSelectList, validateRole} from "@/api/setting";
+import {ElMessage, ElMessageBox, type FormRules} from "element-plus";
 import type {Role} from "@/api/type";
 
 // 角色类型
@@ -200,9 +200,13 @@ const validateRoleName = async (rule: any, value: any, callback: any) => {
   if (value === '') {
     callback(new Error('请输入角色名称'));
   } else {
-    const result = await validateRole(value, 'roleName');
-    if (!result.success) {
-      callback(new Error(result.message));
+    if (editValidateParams.roleName === '' || editValidateParams.roleName !== roleEditParams.roleName) {
+      const result = await validateRole(value, 'roleName');
+      if (!result.success) {
+        callback(new Error(result.message));
+      } else {
+        callback();
+      }
     } else {
       callback();
     }
@@ -210,22 +214,26 @@ const validateRoleName = async (rule: any, value: any, callback: any) => {
 }
 
 /**
- * 角色名校验
+ * 角色编码校验
  */
 const validateRoleCode = async (rule: any, value: any, callback: any) => {
   if (value === '') {
     callback(new Error('请输入角色编码'));
   } else {
-    const result = await validateRole(value, 'roleCode');
-    if (!result.success) {
-      callback(new Error(result.message));
+    if (editValidateParams.roleCode === '' || editValidateParams.roleCode !== roleEditParams.roleCode) {
+      const result = await validateRole(value, 'roleCode');
+      if (!result.success) {
+        callback(new Error(result.message));
+      } else {
+        callback();
+      }
     } else {
       callback();
     }
   }
 }
 
-const addRoleRules = reactive<FormRules<Role>>({
+const roleRules = reactive<FormRules<Role>>({
   roleType: [{required: true, message: '请选择角色类型', trigger: 'blur'}],
   roleName: [{validator: validateRoleName, trigger: 'blur'}],
   roleCode: [{validator: validateRoleCode, trigger: 'blur'}],
@@ -266,19 +274,72 @@ watch(editDialogVisible, (value) => {
   }
 })
 const roleEditParams = reactive({
+  id: '',
   roleType: '',
   roleName: '',
   parentId: '',
   roleCode: '',
   description: '',
 })
+let editValidateParams = {
+  roleName: '',
+  roleCode: ''
+}
+
 function openEditDialog(row) {
+  roleEditParams.id = row.id
   roleEditParams.roleType = row.roleType
   roleEditParams.roleName = row.roleName
   roleEditParams.parentId = row.parentId
   roleEditParams.roleCode = row.roleCode
   roleEditParams.description = row.description
+
+  editValidateParams.roleName = row.roleName
+  editValidateParams.roleCode = row.roleCode
+
   editDialogVisible.value = true
+}
+
+function clearCache() {
+  editValidateParams.roleName = ''
+  editValidateParams.roleCode = ''
+}
+
+/**
+ * 修改角色
+ */
+function handleEditRole() {
+  editRoleForm.value.validate(async (valid) => {
+    if (valid) {
+      const result = await editRole(roleEditParams)
+      if (result.success) {
+        ElMessage.success(result.message)
+        await queryRoleList()
+        editDialogVisible.value = false
+      } else {
+        ElMessage.error(result.message)
+      }
+    }
+  })
+}
+
+/**
+ * 删除角色
+ */
+function handleDeleteRole(id: string, roleName: string) {
+  ElMessageBox.confirm('确认删除角色（'+roleName+'）吗？', {
+    type: 'warning',
+    confirmButtonText: '确认',
+    cancelButtonText: '取消'
+  }).then(async () => {
+    const result = await deleteRole(id)
+    if (result.success) {
+      ElMessage.success('删除成功！');
+      await queryRoleList()
+    } else {
+      ElMessage.error(result.message)
+    }
+  }).catch(() => {})
 }
 
 onMounted(() => {

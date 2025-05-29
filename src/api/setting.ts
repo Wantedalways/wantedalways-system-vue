@@ -6,6 +6,8 @@ enum Api {
   getRoleSelectList = '/sys/role/selectList',
   addRole = '/sys/role/add',
   validateRole = '/sys/role/validate',
+  editRole = '/sys/role/edit',
+  deleteRole = '/sys/role/delete',
 }
 
 // 查询角色列表
@@ -26,4 +28,14 @@ export function addRole(role: Role) {
 // 校验角色
 export function validateRole(param: string, paramType: string) {
   return get(Api.validateRole, {'validateParam': param, 'paramType': paramType})
+}
+
+// 修改角色
+export function editRole(role: Role) {
+  return post(Api.editRole, role)
+}
+
+// 删除角色
+export function deleteRole(id: string) {
+  return post(Api.deleteRole, {'id': id})
 }
