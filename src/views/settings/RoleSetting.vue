@@ -47,7 +47,7 @@
         <el-table-column label="操作">
           <template #default="scope">
             <el-button size="small" text type="primary">用户</el-button>
-            <el-button size="small" text type="primary">授权</el-button>
+            <el-button size="small" text type="primary" @click="handleAuthorize(scope.row.id)">授权</el-button>
             <el-dropdown class="button-more" trigger="click">
               <el-button size="small" text type="info">
                 更多
@@ -71,7 +71,12 @@
       </el-table>
     </el-row>
     <div class="pagination-wrapper">
-      分页
+      <el-pagination layout="total, prev, pager, next, sizes"
+                     :total="roleResult.total"
+                     background
+                     v-model:current-page="roleQueryParams.pageNo" @update:current-page="queryRoleList"
+                     v-model:page-size="roleQueryParams.pageSize" @update:page-size="queryRoleList"
+      />
     </div>
   </div>
   <el-dialog v-model="addDialogVisible" title="新建角色" class="role-dialog" :show-close="false" @open="queryRoleSelectList">
@@ -136,6 +141,8 @@
       <el-button @click="editDialogVisible = false" class="role-modify-button">取消</el-button>
     </template>
   </el-dialog>
+
+  <permission-drawer v-model:visible="authorizeVisible" :role-id="selectedRoleId" :owned-ids="ownedPermissionIds" />
 </template>
 
 <script setup lang="ts">
@@ -143,9 +150,18 @@ import {computed, onMounted, reactive, ref, watch} from "vue";
 import {getDict} from "@/utils";
 import {DICT_ROLE_TYPE} from "@/constant/cache";
 import {ArrowDown, Plus, Refresh, Search} from "@element-plus/icons-vue";
-import {addRole, deleteRole, editRole, getRoleList, getRoleSelectList, validateRole} from "@/api/setting";
+import {
+  addRole,
+  deleteRole,
+  editRole,
+  getPermissionIdsByRole,
+  getRoleList,
+  getRoleSelectList,
+  validateRole
+} from "@/api/setting";
 import {ElMessage, ElMessageBox, type FormRules} from "element-plus";
 import type {Role} from "@/api/type";
+import PermissionDrawer from "@/components/permission/PermissionDrawer.vue";
 
 // 角色类型
 const roleType = computed(() => getDict(DICT_ROLE_TYPE))
@@ -285,7 +301,8 @@ const roleEditParams = reactive({
   roleCode: '',
   description: '',
 })
-let editValidateParams = {
+
+const editValidateParams = {
   roleName: '',
   roleCode: ''
 }
@@ -338,7 +355,7 @@ function handleDeleteRole(id: string, roleName: string) {
   }).then(async () => {
     const result = await deleteRole(id)
     if (result.success) {
-      ElMessage.success('删除成功！');
+      ElMessage.success(result.message);
       await queryRoleList()
     } else {
       ElMessage.error(result.message)
@@ -349,14 +366,14 @@ function handleDeleteRole(id: string, roleName: string) {
 /**
  * 表格排序
  */
-function handleSort(data: any[]) {
-  const orderBy = data.prop
-  if (orderBy.indexOf('_dictText') !== -1) {
-    roleQueryParams.orderBy = orderBy.substring(0, orderBy.indexOf('_dictText'))
+function handleSort(data: {column: any, prop: string, order: any }) {
+  const {prop, order} = data
+  if (prop.indexOf('_dictText') !== -1) {
+    roleQueryParams.orderBy = prop.substring(0, prop.indexOf('_dictText'))
   } else {
-    roleQueryParams.orderBy = orderBy
+    roleQueryParams.orderBy = prop
   }
-  roleQueryParams.order = data.order === 'descending' ? 'desc' : 'asc'
+  roleQueryParams.order = order === 'descending' ? 'desc' : 'asc'
 
   queryRoleList()
 }
@@ -376,6 +393,25 @@ function handleRefresh() {
   // 清空排序
   roleTable.value.clearSort()
   queryRoleList()
+}
+
+// 授权列表
+const authorizeVisible = ref(false)
+const selectedRoleId = ref('')
+const ownedPermissionIds = ref([])
+/**
+ * 打开授权列表
+ */
+async function handleAuthorize(id: string) {
+  authorizeVisible.value = true
+  selectedRoleId.value = id
+
+  const result = await getPermissionIdsByRole(id)
+  if (result.success) {
+    ownedPermissionIds.value = result.data
+  } else {
+    ElMessage.error(result.message)
+  }
 }
 
 onMounted(() => {
@@ -412,10 +448,6 @@ export default {
       .role-add-button {
         width: 100px;
       }
-    }
-
-    .role-table {
-
     }
   }
 }
