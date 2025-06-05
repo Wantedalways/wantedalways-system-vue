@@ -26,3 +26,10 @@ export interface Role {
   description: string
 }
 
+// 角色授权
+export interface PermissionForRole {
+  roleId: string,
+  newPermissionIds: string[],
+  oldPermissionIds: string[]
+}
+

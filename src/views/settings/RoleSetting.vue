@@ -72,7 +72,7 @@
     </el-row>
     <div class="pagination-wrapper">
       <el-pagination layout="total, prev, pager, next, sizes"
-                     :total="roleResult.total"
+                     :total="roleResult.total || 0"
                      background
                      v-model:current-page="roleQueryParams.pageNo" @update:current-page="queryRoleList"
                      v-model:page-size="roleQueryParams.pageSize" @update:page-size="queryRoleList"
@@ -80,7 +80,7 @@
     </div>
   </div>
   <el-dialog v-model="addDialogVisible" title="新建角色" class="role-dialog" :show-close="false" @open="queryRoleSelectList">
-    <el-form :model="roleAddParams" :rules="roleRules" hide-required-asterisk ref="addRoleForm" class="role-form">
+    <el-form :model="roleAddParams" :rules="roleRules" hide-required-asterisk ref="addRoleFormRef" class="role-form">
       <el-form-item label="角色类型" prop="roleType" class="role-form-item">
         <el-select
           v-model="roleAddParams.roleType"
@@ -111,7 +111,7 @@
     </template>
   </el-dialog>
   <el-dialog v-model="editDialogVisible" title="修改角色" class="role-dialog" :show-close="false" @open="queryRoleSelectList" @close="clearCache">
-    <el-form :model="roleEditParams" :rules="roleRules" hide-required-asterisk ref="editRoleForm" class="role-form">
+    <el-form :model="roleEditParams" :rules="roleRules" hide-required-asterisk ref="editRoleFormRef" class="role-form">
       <el-form-item label="角色类型" prop="roleType" class="role-form-item">
         <el-select
           v-model="roleEditParams.roleType"
@@ -142,7 +142,7 @@
     </template>
   </el-dialog>
 
-  <permission-drawer v-model:visible="authorizeVisible" :role-id="selectedRoleId" :owned-ids="ownedPermissionIds" />
+  <permission-drawer v-model:visible="authorizeVisible" :role-id="selectedRoleId" v-model:owned-ids="ownedPermissionIds" />
 </template>
 
 <script setup lang="ts">
@@ -260,13 +260,13 @@ const roleRules = reactive<FormRules<Role>>({
   description: [{required: true, message: '请输入角色描述', trigger: 'blur'}]
 })
 
-const addRoleForm = ref()
+const addRoleFormRef = ref()
 
 /**
  * 新增角色
  */
 function handleAddRole() {
-  addRoleForm.value.validate(async (valid) => {
+  addRoleFormRef.value.validate(async (valid) => {
     if (valid) {
       const result = await addRole(roleAddParams)
       if (result.success) {
@@ -282,15 +282,15 @@ function handleAddRole() {
 
 watch(addDialogVisible, (value) => {
   if (!value) {
-    addRoleForm.value.resetFields()
+    addRoleFormRef.value.resetFields()
   }
 })
 
 const editDialogVisible = ref(false)
-const editRoleForm = ref()
+const editRoleFormRef = ref()
 watch(editDialogVisible, (value) => {
   if (!value) {
-    editRoleForm.value.resetFields()
+    editRoleFormRef.value.resetFields()
   }
 })
 const roleEditParams = reactive({
@@ -330,7 +330,7 @@ function clearCache() {
  * 修改角色
  */
 function handleEditRole() {
-  editRoleForm.value.validate(async (valid) => {
+  editRoleFormRef.value.validate(async (valid) => {
     if (valid) {
       const result = await editRole(roleEditParams)
       if (result.success) {

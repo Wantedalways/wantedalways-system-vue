@@ -1,4 +1,4 @@
-import type {Role, RoleQueryParams} from "@/api/type";
+import type {PermissionForRole, Role, RoleQueryParams} from "@/api/type";
 import {get, post} from "@/api/index";
 
 enum Api {
@@ -9,7 +9,8 @@ enum Api {
   editRole = '/sys/role/edit',
   deleteRole = '/sys/role/delete',
   getPermissionIdsByRole = '/sys/rolePermission/getPermissionIdsByRole',
-  getAllPermissionAsTree = '/sys/permission/getAllAsTree'
+  getAllPermissionAsTree = '/sys/permission/getAllAsTree',
+  setPermissionForRole = '/sys/rolePermission/setForRole'
 }
 
 /**
@@ -66,4 +67,11 @@ export function getPermissionIdsByRole(id: string) {
  */
 export function getAllPermissionAsTree() {
   return get(Api.getAllPermissionAsTree)
+}
+
+/**
+ * 为单个角色授权
+ */
+export function setPermissionForRole(data: PermissionForRole) {
+  return post(Api.setPermissionForRole, data)
 }

@@ -1,33 +1,57 @@
 <template>
-  <el-drawer v-model="drawerVisible" title="权限列表" :show-close="false" @closed="handleClose">
-    <div>
-      <el-checkbox @change="handleCheckAll" v-model="checkAll" :indeterminate="isIndeterminate">全选</el-checkbox>
-      <el-divider direction="vertical" />
-      <el-text @click="handleExpand">
+  <el-drawer v-model="drawerVisible" title="权限列表" :show-close="false" ref="permissionDrawerRef"
+             :before-close="handleClose">
+    <div class="tool-wrapper">
+      <el-input v-model="treeQueryParam" placeholder="权限名称" :prefix-icon="Search" clearable class="search"/>
+      <el-checkbox @change="handleCheckAll" v-model="checkAll" :indeterminate="isIndeterminate" class="check-all">全选
+      </el-checkbox>
+      <el-divider direction="vertical" class="divider"/>
+      <el-text @click="handleExpand" class="expand">
         <el-icon>
-          <ArrowUpBold v-if="isExpand" />
-          <ArrowDownBold v-else />
+          <ArrowUpBold v-if="isExpand"/>
+          <ArrowDownBold v-else/>
         </el-icon>
         {{ isExpand ? '收起' : '展开' }}全部
       </el-text>
     </div>
-    <el-tree :data="permissionTreeData" show-checkbox node-key="id" :default-checked-keys="props.ownedIds" :default-expanded-keys="props.ownedIds" ref="permissionTree">
-
+    <el-text class="tree-title" tag="b">当前权限</el-text>
+    <el-tree :data="permissionTreeData"
+             show-checkbox
+             node-key="id"
+             :default-checked-keys="checkedKeys"
+             :default-expanded-keys="expandKeys"
+             ref="permissionTreeRef"
+             check-strictly
+             @check="handleTreeCheck"
+             :filter-node-method="treeFilter"
+             class="tree"
+    >
+      <template #default="{node, data}">
+        <el-text :class="{'is_matched': data.isMatched}" class="tree-node-span">
+          {{ node.label }}
+          <el-icon v-show="data.isMatched">
+            <Star/>
+          </el-icon>
+        </el-text>
+      </template>
     </el-tree>
-    <div>
-      <el-button type="primary" @click="handleSaveAndClose">保存</el-button>
+    <div class="button-wrapper">
+      <el-button @click="closeDrawer">取消</el-button>
+      <el-button type="primary" @click="handleSave">仅保存</el-button>
+      <el-button type="primary" @click="handleSaveAndClose">保存并关闭</el-button>
     </div>
   </el-drawer>
 </template>
 
 <script setup lang="ts">
-import {computed, onMounted, reactive, ref, watch, watchEffect} from "vue";
-import {getAllPermissionAsTree} from "@/api/setting";
+import {computed, onMounted, reactive, ref, watch} from "vue";
+import {getAllPermissionAsTree, setPermissionForRole} from "@/api/setting";
 import {ElMessage} from "element-plus";
-import {ArrowDownBold, ArrowUpBold} from "@element-plus/icons-vue";
+import {ArrowDownBold, ArrowUpBold, Place, Search, Star} from "@element-plus/icons-vue";
+import type {PermissionForRole} from "@/api/type";
 
 const props = defineProps(['visible', 'roleId', 'ownedIds']);
-const emit = defineEmits(["update:visible"])
+const emit = defineEmits(["update:visible", 'update:ownedIds'])
 const drawerVisible = computed({
   get() {
     return props.visible
@@ -37,15 +61,34 @@ const drawerVisible = computed({
   }
 })
 
-watch(props, (val) => {
-  console.log(val)
-})
-
 const checkAll = ref(false);
 const isExpand = ref(false)
 
 const permissionTreeData = reactive([])
 const allIds = ref([])
+const checkedKeys = ref([])
+const expandKeys = ref([])
+const permissionTreeRef = ref()
+const isIndeterminate = ref(false)
+
+watch(() => props.ownedIds, (newVal) => {
+  checkedKeys.value = newVal
+  expandKeys.value = newVal
+  if (checkedKeys.value.length === 0) {
+    checkAll.value = false
+    isIndeterminate.value = false
+    isExpand.value = false
+  } else if (checkedKeys.value.length === allIds.value.length) {
+    checkAll.value = true
+    isIndeterminate.value = false
+    isExpand.value = true
+  } else {
+    checkAll.value = false
+    isIndeterminate.value = true
+    isExpand.value = true
+  }
+})
+
 /**
  * 获取权限树状数据
  */
@@ -59,14 +102,82 @@ async function queryPermissionTree() {
   }
 }
 
-function handleSaveAndClose() {
+/**
+ * 权限筛选
+ */
+const treeQueryParam = ref('')
 
+function treeFilter(value: string, data, node) {
+  if (!value) {
+    data.isMatched = false
+    if (node.expanded) {
+      isExpand.value = true
+    }
+    return true
+  }
+  if (data.label.includes(value)) {
+    data.isMatched = true
+    return true
+  }
+  return false
 }
 
-const permissionTree = ref()
-const isIndeterminate = ref(false)
-function handleClose() {
-  permissionTree.value.setCheckedKeys([])
+watch(treeQueryParam, (val) => {
+  permissionTreeRef.value.filter(val)
+})
+
+const permissionDrawerRef = ref()
+
+/**
+ * 取消
+ */
+function closeDrawer() {
+  permissionDrawerRef.value.handleClose()
+}
+
+/**
+ * 保存
+ */
+async function handleSave() {
+  const propsOwnedIds = props.ownedIds
+  if (checkedKeys.value.sort().toString() === propsOwnedIds.sort().toString()) {
+    return
+  }
+  const data: PermissionForRole = {
+    roleId: props.roleId,
+    newPermissionIds: checkedKeys.value,
+    oldPermissionIds: propsOwnedIds
+  }
+  const result = await setPermissionForRole(data)
+  if (result.success) {
+    emit('update:ownedIds', checkedKeys.value)
+    ElMessage.success(result.message)
+  } else {
+    ElMessage.error(result.message)
+  }
+}
+
+/**
+ * 保存并关闭
+ */
+function handleSaveAndClose() {
+  handleSave()
+  closeDrawer()
+}
+
+/**
+ * 关闭时选中状态
+ */
+function handleClose(done: (cancel?: boolean) => void) {
+  permissionTreeRef.value.setCheckedKeys([])
+  checkAll.value = false
+  isIndeterminate.value = false
+  const nodeList = permissionTreeRef.value.store._getAllNodes()
+  for (const node of nodeList) {
+    node.expanded = false
+  }
+  treeQueryParam.value = ''
+  done()
 }
 
 /**
@@ -74,7 +185,8 @@ function handleClose() {
  */
 function handleCheckAll(value: boolean) {
   const keys = value ? allIds.value : []
-  permissionTree.value.setCheckedKeys(keys, false)
+  checkedKeys.value = keys
+  permissionTreeRef.value.setCheckedKeys(keys, false)
   if (value) {
     isIndeterminate.value = false
   }
@@ -85,10 +197,19 @@ function handleCheckAll(value: boolean) {
  */
 function handleExpand() {
   isExpand.value = !isExpand.value
-  const nodeList = permissionTree.value.store._getAllNodes()
+  const nodeList = permissionTreeRef.value.store._getAllNodes()
   for (const node of nodeList) {
     node.expanded = isExpand.value
   }
+}
+
+/**
+ * 权限节点选择
+ */
+function handleTreeCheck() {
+  checkedKeys.value = permissionTreeRef.value.getCheckedKeys()
+  checkAll.value = checkedKeys.value.length === allIds.value.length
+  isIndeterminate.value = checkedKeys.value.length === 0 ? false : checkedKeys.value.length !== allIds.value.length
 }
 
 onMounted(() => {
@@ -103,5 +224,48 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.tool-wrapper {
+  //border-bottom: 1px solid var(--el-menu-border-color);
+  margin-bottom: 10px;
+  display: flex;
+  flex-wrap: wrap;
 
+  .search {
+    padding: 0 24px 5px 24px;
+  }
+
+  .check-all {
+    padding-left: 24px;
+  }
+
+  .divider {
+    align-self: center;
+  }
+
+  .expand {
+    align-self: center;
+    cursor: pointer;
+  }
+}
+
+.tree-title {
+  margin-left: 24px;
+}
+
+.tree {
+  margin-top: 5px;
+}
+
+.is_matched {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  color: var(--el-color-primary);
+}
+
+.button-wrapper {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+}
 </style>
