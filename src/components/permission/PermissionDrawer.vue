@@ -47,7 +47,7 @@
 import {computed, onMounted, reactive, ref, watch} from "vue";
 import {getAllPermissionAsTree, setPermissionForRole} from "@/api/setting";
 import {ElMessage} from "element-plus";
-import {ArrowDownBold, ArrowUpBold, Place, Search, Star} from "@element-plus/icons-vue";
+import {ArrowDownBold, ArrowUpBold, Search, Star} from "@element-plus/icons-vue";
 import type {PermissionForRole} from "@/api/type";
 
 const props = defineProps(['visible', 'roleId', 'ownedIds']);

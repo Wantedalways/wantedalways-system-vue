@@ -1,8 +1,9 @@
 <template>
   <tree-dialog v-model:visible="visible"
-               title="部门"
+               :title="title"
                v-model:selected-items="selectedDepartItems"
                v-model:result-items="resultDeparts"
+               :type="'部门'"
   >
     <div class="tree-wrapper">
       <el-input v-model="departQueryParams" :prefix-icon="Search" placeholder="搜索部门" class="search"></el-input>
@@ -30,13 +31,13 @@
 <script setup lang="ts">
 import {computed, onMounted, reactive, ref, watch} from "vue";
 import TreeDialog from "@/components/treeDialog/TreeDialog.vue";
-import {Histogram, Management, Menu, Platform, Search, Select} from "@element-plus/icons-vue";
+import {Management, Search, Select} from "@element-plus/icons-vue";
 import storage from "@/utils/storage";
 import {DEPART_TREE} from "@/constant/cache";
 import {getDepartTreeList} from "@/api/setting";
 import {ElMessage} from "element-plus";
 
-const props = defineProps(["visible", 'resultDeparts']);
+const props = defineProps(["visible", 'resultDeparts', 'title']);
 const emit = defineEmits(["update:visible", 'update:resultDeparts']);
 const visible = computed({
   get() {
@@ -123,6 +124,14 @@ watch(visible, (value) => {
     }
     defaultExpand.value = [departTreeData[0].id]
   }
+})
+
+function clear() {
+  selectedDepartItems.value = [];
+}
+
+defineExpose({
+  clear
 })
 onMounted(() => {
   getDepartTree()

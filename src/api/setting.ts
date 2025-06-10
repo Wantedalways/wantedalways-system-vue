@@ -1,4 +1,4 @@
-import type {PermissionForRole, Role, RoleQueryParams, UserListForRoleParams} from "@/api/type";
+import type {PermissionForRole, Role, RoleQueryParams, UserListForRoleParams, UsersForRole} from "@/api/type";
 import {get, post} from "@/api/index";
 
 enum Api {
@@ -12,7 +12,9 @@ enum Api {
   getAllPermissionAsTree = '/sys/permission/getAllAsTree',
   setPermissionForRole = '/sys/rolePermission/setForRole',
   getUserListByRole = '/sys/userRole/getUserListByRole',
-  getDepartTreeList = '/sys/depart/getDepartTreeList'
+  getDepartTreeList = '/sys/depart/getDepartTreeList',
+  getUserTreeList = '/sys/userDepart/getUserTreeList',
+  addUsersForRole = '/sys/userRole/addUsersForRole'
 }
 
 /**
@@ -90,4 +92,18 @@ export function getUserListByRole(params: UserListForRoleParams) {
  */
 export function getDepartTreeList() {
   return get(Api.getDepartTreeList)
+}
+
+/**
+ * 获取用户树
+ */
+export function getUserTreeList(parentId: string) {
+  return get(Api.getUserTreeList, {'parentId': parentId})
+}
+
+/**
+ * 为角色添加关联用户
+ */
+export function addUsersForRole(roleUsersModel: UsersForRole) {
+  return post(Api.addUsersForRole, roleUsersModel)
 }

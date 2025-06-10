@@ -1,14 +1,26 @@
 <template>
-  <el-dialog v-model="visible" :title="'选择' + title" class="dialog-container" @close="handleClose" :show-close="false">
+  <el-dialog v-model="visible"
+             :title="title"
+             class="dialog-container"
+             @close="handleClose"
+             @closed="handleAfterClose"
+             :show-close="false"
+             draggable
+             ref="dialogRef"
+             align-center
+  >
     <div class="body">
       <div class="tree-container">
         <slot></slot>
       </div>
       <div class="selected-wrapper">
-        <el-text>已选择部门</el-text>
+        <el-text>已选择{{ type }}</el-text>
         <el-scrollbar class="selected-scrollbar">
           <div v-for="item in selectedItems" :key="item.id" class="selected-item">
-            <el-icon class="selected-icon"><Management /></el-icon>
+            <el-icon class="selected-icon">
+              <Management v-if="!item.userFlag" />
+              <UserFilled v-if="item.userFlag" />
+            </el-icon>
             <el-text class="selected-label">{{item.label}}</el-text>
             <el-icon @click="handleRemoveItem(item.id)" class="selected-close"><CloseBold /></el-icon>
           </div>
@@ -23,11 +35,10 @@
 </template>
 
 <script setup lang="ts">
-import {computed, ref, toRaw} from "vue";
-import {Close, CloseBold, Management} from "@element-plus/icons-vue";
-import {ElMessage} from "element-plus";
+import {computed, ref} from "vue";
+import {CloseBold, Management, UserFilled} from "@element-plus/icons-vue";
 
-const props = defineProps(["visible", 'title', 'selectedItems', 'resultItems']);
+const props = defineProps(["visible", 'title', 'selectedItems', 'resultItems', 'type']);
 const emit = defineEmits(["update:visible", "update:selectedItems", 'update:resultItems']);
 const visible = computed({
   get() {
@@ -71,6 +82,7 @@ function handleCancel() {
   visible.value = false;
 }
 
+const dialogRef = ref()
 /**
  * 关闭
  */
@@ -78,6 +90,13 @@ function handleClose() {
   if (!isConfirm.value) {
     selectedItems.value = [];
   }
+}
+
+/**
+ * 重置位置
+ */
+function handleAfterClose() {
+  dialogRef.value.resetPosition()
 }
 
 /**

@@ -11,7 +11,7 @@
 <script setup lang="ts">
 import {ref} from "vue";
 import {Sunny} from "@element-plus/icons-vue";
-import { useDark, useToggle } from '@vueuse/core'
+import {useDark, useToggle} from '@vueuse/core'
 
 const isDark = useDark()
 const toggleDark = useToggle(isDark)

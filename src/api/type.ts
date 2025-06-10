@@ -44,3 +44,9 @@ export interface UserListForRoleParams {
   order: string
 }
 
+// 用户角色关联
+export interface UsersForRole {
+  roleId: string,
+  userIdList: string[]
+}
+

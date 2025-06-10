@@ -38,7 +38,7 @@ import usePermissionStore from "@/stores/modules/permission";
 import path from "path-browserify";
 import {ElScrollbar} from "element-plus";
 
-  const appStore = useAppStore()
+const appStore = useAppStore()
   const visitedTags = computed(() => appStore.visitedTags)
   let affix = []
   /**
