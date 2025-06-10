@@ -30,7 +30,7 @@
         :cell-style="{'text-align': 'center'}"
         class="role-table"
         @sort-change="handleSort"
-        ref="roleTable"
+        ref="roleTableRef"
       >
 <!--        <el-table-column type="index" label="序号" :index='index' />-->
         <el-table-column prop="roleType_dictText" label="类型" sortable="custom" />
@@ -46,7 +46,10 @@
         <el-table-column prop="createTime" label="创建时间" sortable="custom" />
         <el-table-column label="操作">
           <template #default="scope">
-            <el-button size="small" text type="primary">用户</el-button>
+            <el-button v-if="scope.row.roleType_dictText === '用户角色'" size="small" text type="primary" @click="handleUser(scope.row.id)">用户</el-button>
+            <el-button v-else-if="scope.row.roleType_dictText === '部门角色'" size="small" text type="primary">部门</el-button>
+            <el-button v-else-if="scope.row.roleType_dictText === '用户组角色'" size="small" text type="primary">用户组</el-button>
+            <el-button v-else-if="scope.row.roleType_dictText === '职位角色'" size="small" text type="primary">职位</el-button>
             <el-button size="small" text type="primary" @click="handleAuthorize(scope.row.id)">授权</el-button>
             <el-dropdown class="button-more" trigger="click">
               <el-button size="small" text type="info">
@@ -143,6 +146,8 @@
   </el-dialog>
 
   <permission-drawer v-model:visible="authorizeVisible" :role-id="selectedRoleId" v-model:owned-ids="ownedPermissionIds" />
+
+  <user-dialog v-model:visible="userDialogVisible" :role-id="selectedRoleId"></user-dialog>
 </template>
 
 <script setup lang="ts">
@@ -162,6 +167,7 @@ import {
 import {ElMessage, ElMessageBox, type FormRules} from "element-plus";
 import type {Role} from "@/api/type";
 import PermissionDrawer from "@/components/permission/PermissionDrawer.vue";
+import UserDialog from "@/components/user/UserDialog.vue";
 
 // 角色类型
 const roleType = computed(() => getDict(DICT_ROLE_TYPE))
@@ -378,7 +384,7 @@ function handleSort(data: {column: any, prop: string, order: any }) {
   queryRoleList()
 }
 
-const roleTable = ref()
+const roleTableRef = ref()
 /**
  * 刷新查询
  */
@@ -391,7 +397,7 @@ function handleRefresh() {
   roleQueryParams.order = ''
 
   // 清空排序
-  roleTable.value.clearSort()
+  roleTableRef.value.clearSort()
   queryRoleList()
 }
 
@@ -412,6 +418,15 @@ async function handleAuthorize(id: string) {
   } else {
     ElMessage.error(result.message)
   }
+}
+
+const userDialogVisible = ref(false)
+/**
+ * 查询相关用户
+ */
+function handleUser(id: string) {
+  selectedRoleId.value = id
+  userDialogVisible.value = true
 }
 
 onMounted(() => {

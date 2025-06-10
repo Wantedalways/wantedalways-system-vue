@@ -33,3 +33,14 @@ export interface PermissionForRole {
   oldPermissionIds: string[]
 }
 
+// 角色关联用户查询参数
+export interface UserListForRoleParams {
+  roleId: string,
+  username: string,
+  departIds: string,
+  pageNo: number,
+  pageSize: number,
+  orderBy: string,
+  order: string
+}
+

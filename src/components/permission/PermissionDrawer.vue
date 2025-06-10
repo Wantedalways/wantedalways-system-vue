@@ -1,8 +1,8 @@
 <template>
   <el-drawer v-model="drawerVisible" title="权限列表" :show-close="false" ref="permissionDrawerRef"
-             :before-close="handleClose">
+             :before-close="handleClose" class="permission_drawer">
     <div class="tool-wrapper">
-      <el-input v-model="treeQueryParam" placeholder="权限名称" :prefix-icon="Search" clearable class="search"/>
+      <el-input v-model="treeQueryParam" placeholder="权限名称" :prefix-icon="Search" clearable class="search" />
       <el-checkbox @change="handleCheckAll" v-model="checkAll" :indeterminate="isIndeterminate" class="check-all">全选
       </el-checkbox>
       <el-divider direction="vertical" class="divider"/>
@@ -11,10 +11,10 @@
           <ArrowUpBold v-if="isExpand"/>
           <ArrowDownBold v-else/>
         </el-icon>
-        {{ isExpand ? '收起' : '展开' }}全部
+        &nbsp;{{ isExpand ? '收起' : '展开' }}全部&nbsp;
       </el-text>
     </div>
-    <el-text class="tree-title" tag="b">当前权限</el-text>
+<!--    <el-text class="tree-title" tag="b">当前权限</el-text>-->
     <el-tree :data="permissionTreeData"
              show-checkbox
              node-key="id"
@@ -37,7 +37,7 @@
     </el-tree>
     <div class="button-wrapper">
       <el-button @click="closeDrawer">取消</el-button>
-      <el-button type="primary" @click="handleSave">仅保存</el-button>
+      <el-button type="primary" plain @click="handleSave">仅保存</el-button>
       <el-button type="primary" @click="handleSaveAndClose">保存并关闭</el-button>
     </div>
   </el-drawer>
@@ -225,13 +225,15 @@ export default {
 
 <style scoped lang="scss">
 .tool-wrapper {
-  //border-bottom: 1px solid var(--el-menu-border-color);
-  margin-bottom: 10px;
+  margin-bottom: 5px;
   display: flex;
   flex-wrap: wrap;
+  position: relative;
 
   .search {
-    padding: 0 24px 5px 24px;
+    //padding: 0 24px 5px 24px;
+    padding: 0 12px 5px 12px;
+    margin-bottom: 10px;
   }
 
   .check-all {
@@ -245,27 +247,60 @@ export default {
   .expand {
     align-self: center;
     cursor: pointer;
+    border-radius: 5px;
+
+    &:hover {
+      background-color: var(--el-color-primary-light-9);
+      color: var(--el-color-primary);
+    }
   }
+}
+
+.tool-wrapper:after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 12px;
+  width: 50%;
+  height: 1px;
+  background-color: var(--el-menu-border-color);
 }
 
 .tree-title {
   margin-left: 24px;
+  width: 100%;
 }
 
 .tree {
   margin-top: 5px;
+
+  .is_matched {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    color: var(--el-color-primary);
+  }
 }
 
-.is_matched {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  color: var(--el-color-primary);
-}
+
 
 .button-wrapper {
   position: absolute;
   bottom: 20px;
   right: 20px;
+}
+</style>
+
+<style lang="scss">
+.permission_drawer {
+  .el-drawer__header {
+    padding-left: 20px;
+    font-weight: bold;
+    //color: var(--el-color-primary);
+    margin-bottom: 0;
+    padding-bottom: 20px;
+    //border-bottom: 1px solid var(--el-menu-border-color);
+    box-shadow: 2px 2px 3px 0 rgba(0, 0, 0, .3);
+  }
 }
 </style>
