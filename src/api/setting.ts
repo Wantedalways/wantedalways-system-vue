@@ -1,4 +1,11 @@
-import type {PermissionForRole, Role, RoleQueryParams, UserListForRoleParams, UsersForRole} from "@/api/type";
+import type {
+  PermissionForRole,
+  Role,
+  RoleQueryParams,
+  SysUserRole,
+  UserListForRoleParams,
+  UsersForRole
+} from "@/api/type";
 import {get, post} from "@/api/index";
 
 enum Api {
@@ -14,7 +21,10 @@ enum Api {
   getUserListByRole = '/sys/userRole/getUserListByRole',
   getDepartTreeList = '/sys/depart/getDepartTreeList',
   getUserTreeList = '/sys/userDepart/getUserTreeList',
-  addUsersForRole = '/sys/userRole/addUsersForRole'
+  addUsersForRole = '/sys/userRole/addUsersForRole',
+  removeUsersFromRole = '/sys/userRole/deleteUsersFromRole',
+  removeUserFromRole = '/sys/userRole/deleteUserFromRole',
+  getUserListWithDepart = '/sys/user/listWithDepart',
 }
 
 /**
@@ -107,3 +117,25 @@ export function getUserTreeList(parentId: string) {
 export function addUsersForRole(roleUsersModel: UsersForRole) {
   return post(Api.addUsersForRole, roleUsersModel)
 }
+
+/**
+ * 删除角色关联的用户（批量）
+ */
+export function removeUsersFromRole(roleUsersModel: UsersForRole) {
+  return post(Api.removeUsersFromRole, roleUsersModel)
+}
+
+/**
+ * 删除角色关联的用户
+ */
+export function removeUserFromRole(sysUserRole: SysUserRole) {
+  return post(Api.removeUserFromRole, sysUserRole)
+}
+
+/**
+ * 获取附带部门的用户列表
+ */
+export function getUserListWithDepart(realName: string) {
+  return get(Api.getUserListWithDepart, {'realName': realName})
+}
+

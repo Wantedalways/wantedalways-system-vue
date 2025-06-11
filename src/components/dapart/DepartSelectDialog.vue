@@ -95,10 +95,13 @@ const departTreeRef = ref()
  * 刷新选中状态
  */
 watch(selectedDepartItems, (value) => {
-  departTreeRef.value.setCheckedKeys([])
-  value.forEach(item => {
-    departTreeRef.value.setChecked(item, true, false)
-  })
+  if (departTreeRef.value) {
+    departTreeRef.value.setCheckedKeys([])
+    value.forEach(item => {
+      departTreeRef.value.setChecked(item, true, false)
+    })
+  }
+
 }, {deep: true})
 
 /**

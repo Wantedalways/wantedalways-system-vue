@@ -18,7 +18,7 @@
       <el-row class="user-table-wrapper">
         <div class="role-button-wrapper">
           <el-button type="primary" :icon="Plus" class="role-add-button" @click="userSelectDialogVisible = true">新增关联</el-button>
-          <el-button :icon="Plus" class="role-add-button">取消关联</el-button>
+          <el-button type="info" plain :icon="CircleClose" class="role-add-button" @click="handleBatchDelete">取消关联</el-button>
         </div>
         <el-table
           v-loading="userLoading"
@@ -35,12 +35,12 @@
           height="270"
         >
           <el-table-column type="selection" />
-          <el-table-column prop="departIds_dictText" label="部门" sortable="custom"/>
+          <el-table-column prop="departIds_dictText" label="部门" sortable="custom" width="200"/>
           <el-table-column prop="realName" label="用户" sortable="custom"/>
           <el-table-column prop="username" label="账号"/>
           <el-table-column label="操作">
             <template #default="scope">
-              <el-button size="small" text type="primary" @click="handleRemove(scope.row.id)">取消关联</el-button>
+              <el-button size="small" text type="danger" @click="handleRemove(scope.row.id)">取消关联</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -64,9 +64,9 @@
 
 <script setup lang="ts">
 import {computed, reactive, ref, watch} from "vue";
-import {ArrowDown, Plus, Refresh, Search} from "@element-plus/icons-vue";
-import {addUsersForRole, getUserListByRole} from "@/api/setting";
-import {ElMessage} from "element-plus";
+import {ArrowDown, CircleClose, Plus, Refresh, Search} from "@element-plus/icons-vue";
+import {addUsersForRole, getUserListByRole, removeUserFromRole, removeUsersFromRole} from "@/api/setting";
+import {ElMessage, ElMessageBox} from "element-plus";
 import DepartSelectDialog from "@/components/dapart/DepartSelectDialog.vue";
 import UserSelectDialog from "@/components/user/UserSelectDialog.vue";
 
@@ -148,7 +148,22 @@ const departSelectVisible = ref(false)
  * 取消关联（单个）
  */
 function handleRemove(userId: string) {
-
+  ElMessageBox.confirm('确认删除关联用户？', {
+    type: 'warning',
+    confirmButtonText: '确认',
+    cancelButtonText: '取消'
+  }).then(async () => {
+    const result = await removeUserFromRole({
+      roleId: props.roleId,
+      userId: userId
+    })
+    if (result.success) {
+      ElMessage.success(result.message)
+      await queryUserListWithRole()
+    } else {
+      ElMessage.error(result.message)
+    }
+  }).catch(() => {})
 }
 
 const resultDeparts = ref([])
@@ -215,7 +230,36 @@ const selectedTableIds = ref([])
  * 用户选择
  */
 function handleSelectUser(value) {
-  console.log(value)
+  selectedTableIds.value = []
+  value.forEach(item => {
+    selectedTableIds.value.push(item.id)
+  })
+}
+
+/**
+ * 批量删除
+ */
+async function handleBatchDelete() {
+  if (selectedTableIds.value.length === 0) {
+    ElMessage.warning('至少选择一名用户！')
+    return
+  }
+  ElMessageBox.confirm('确认删除关联用户？', {
+    type: 'warning',
+    confirmButtonText: '确认',
+    cancelButtonText: '取消'
+  }).then(async () => {
+    const result = await removeUsersFromRole({
+      roleId: props.roleId,
+      userIdList: selectedTableIds.value
+    })
+    if (result.success) {
+      ElMessage.success(result.message)
+      await queryUserListWithRole()
+    } else {
+      ElMessage.error(result.message)
+    }
+  }).catch(() => {})
 }
 </script>
 
@@ -257,6 +301,7 @@ export default {
 
   .el-dialog__body {
     flex-grow: 1;
+    margin-top: 10px;
   }
 }
 </style>

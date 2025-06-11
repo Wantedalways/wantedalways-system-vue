@@ -6,15 +6,22 @@
                :type="'用户'"
   >
     <div class="tree-wrapper">
-      <el-input v-model="userQueryParams" :prefix-icon="Search" placeholder="搜索用户" class="search"></el-input>
+      <el-input v-model="userQueryParams" :prefix-icon="Search" placeholder="搜索用户" class="search" />
       <el-scrollbar class="tree-scrollbar" >
-        <el-tree :data="userTreeData"
+        <div v-show="userQueryVisible" v-loading="userSearchLoading" class="selected-list">
+          <div v-for="item in queryUserListData" :key="item.id" @click="handleSelectSearchUser(item)" class="selected-item">
+            <el-icon class="selected-icon"><UserFilled /></el-icon>
+            <el-text class="selected-user">{{item.realName}}</el-text>
+            <el-text class="selected-depart">{{item.departIds_dictText}}</el-text>
+          </div>
+        </div>
+        <el-tree v-show="!userQueryVisible"
+                 :data="userTreeData"
                  node-key="id"
                  :expand-on-click-node="false"
                  @node-click="handleSelect"
                  ref="userTreeRef"
                  check-strictly
-                 :filter-node-method="treeFilter"
                  lazy
                  :load="handleLoad"
                  :props="treeProps"
@@ -37,10 +44,10 @@
 
 import {Management, Search, Select, UserFilled} from "@element-plus/icons-vue";
 import TreeDialog from "@/components/treeDialog/TreeDialog.vue";
-import {computed, onMounted, reactive, ref, toRaw, toRef, watch} from "vue";
-import {getUserTreeList} from "@/api/setting";
+import {computed, onMounted, reactive, ref, watch} from "vue";
+import {getUserListWithDepart, getUserTreeList} from "@/api/setting";
 import {ElMessage} from "element-plus";
-import user from "@/stores/modules/user";
+import {useDebounceFn} from "@/utils/debounce";
 
 const props = defineProps(["visible", 'resultUsers', 'title']);
 const emit = defineEmits(["update:visible", 'update:resultUsers']);
@@ -69,6 +76,32 @@ const treeProps = {
 
 const userQueryParams = ref('')
 const userTreeData = reactive([])
+const userQueryVisible = ref(false)
+const userSearchLoading = ref(false);
+const queryUserListData = ref([])
+/**
+ * 搜索用户
+ */
+watch(userQueryParams, useDebounceFn(async value => {
+  const realName = value.trim();
+  if (realName) {
+    userQueryVisible.value = true
+    userSearchLoading.value = true
+    const result = await getUserListWithDepart(realName)
+    if (result.success) {
+      queryUserListData.value = result.data
+      userSearchLoading.value = false
+    } else {
+      queryUserListData.value = []
+      userSearchLoading.value = false
+      ElMessage.error(result.message)
+    }
+  } else {
+    queryUserListData.value = []
+    userQueryVisible.value = false
+    userSearchLoading.value = false
+  }
+}))
 
 /**
  * 获取用户树
@@ -94,6 +127,11 @@ async function handleLoad(node: Node, resolve: (data: []) => void, reject: () =>
     const result = await getUserTreeList(node.data.id)
     if (result.success) {
       resolve(result.data)
+      selectedUserItems.value.forEach((item) => {
+        if (item.search) {
+          userTreeRef.value.setChecked(item, true, false);
+        }
+      })
     } else {
       ElMessage.error(result.message)
       reject()
@@ -117,30 +155,42 @@ function handleSelect(data) {
   }
 }
 
+/**
+ * 选择搜索后的用户
+ */
+function handleSelectSearchUser(data) {
+  const user = {
+    id: data.id,
+    label: data.realName,
+    leaf: true,
+    name: data.realName,
+    userFlag: true,
+    search: true
+  }
+  if (selectedUserItems.value.length === 0) {
+    selectedUserItems.value.push(user)
+  }
+  selectedUserItems.value.forEach(item => {
+    if (item.id === user.id) {
+      userQueryParams.value = ''
+    } else {
+      selectedUserItems.value.push(user)
+    }
+  })
+}
+
 const userTreeRef = ref()
 /**
  * 刷新选中状态
  */
 watch(selectedUserItems, (value) => {
-  userTreeRef.value.setCheckedKeys([])
-  value.forEach(item => {
-    userTreeRef.value.setChecked(item, true, false)
-  })
-}, {deep: true})
-
-/**
- * 搜索
- */
-function treeFilter(value: string, data) {
-  if (!value) {
-    return true
+  if (userTreeRef.value) {
+    userTreeRef.value.setCheckedKeys([])
+    value.forEach(item => {
+      userTreeRef.value.setChecked(item, true, false)
+    })
   }
-  return data.label.includes(value)
-}
-
-watch(userQueryParams, (value) => {
-  userTreeRef.value.filter(value)
-})
+}, {deep: true})
 
 watch(visible, (value) => {
   if (value) {
@@ -148,6 +198,7 @@ watch(visible, (value) => {
       selectedUserItems.value = [...resultUsers.value];
     }
   } else {
+    userQueryParams.value = ''
     selectedUserItems.value = []
   }
 })
