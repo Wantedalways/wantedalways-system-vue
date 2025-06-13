@@ -6,7 +6,7 @@
                :type="'用户'"
   >
     <div class="tree-wrapper">
-      <el-input v-model="userQueryParams" :prefix-icon="Search" placeholder="搜索用户" class="search" />
+      <el-input v-model="userQueryParams" :prefix-icon="Search" placeholder="搜索用户" class="search" clearable />
       <el-scrollbar class="tree-scrollbar" >
         <div v-show="userQueryVisible" v-loading="userSearchLoading" class="selected-list">
           <div v-for="item in queryUserListData" :key="item.id" @click="handleSelectSearchUser(item)" class="selected-item">

@@ -6,7 +6,7 @@
                :type="'部门'"
   >
     <div class="tree-wrapper">
-      <el-input v-model="departQueryParams" :prefix-icon="Search" placeholder="搜索部门" class="search"></el-input>
+      <el-input v-model="departQueryParams" :prefix-icon="Search" placeholder="搜索部门" class="search" clearable />
       <el-scrollbar class="tree-scrollbar" >
         <el-tree :data="departTreeData"
                  node-key="id"

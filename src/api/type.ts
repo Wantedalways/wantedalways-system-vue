@@ -55,3 +55,22 @@ export interface SysUserRole {
   roleId: string,
   userId: string
 }
+
+// 权限添加和修改
+export interface Permission {
+  serviceId: string,
+  type: string,
+  parentId: string,
+  name: string,
+  code: string,
+  url: string,
+  component: string,
+  icon: string,
+  sort: string,
+  route: boolean,
+  cache: boolean,
+  hidden: boolean,
+  affix: boolean,
+  status: string,
+  leaf: boolean,
+}

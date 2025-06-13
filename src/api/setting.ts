@@ -1,4 +1,5 @@
 import type {
+  Permission,
   PermissionForRole,
   Role,
   RoleQueryParams,
@@ -25,6 +26,11 @@ enum Api {
   removeUsersFromRole = '/sys/userRole/deleteUsersFromRole',
   removeUserFromRole = '/sys/userRole/deleteUserFromRole',
   getUserListWithDepart = '/sys/user/listWithDepart',
+  getPermissionListAsTree = '/sys/permission/listAsTree',
+  validatePermission = '/sys/permission/validate',
+  addPermission = '/sys/permission/add',
+  editPermission = '/sys/permission/edit',
+  deletePermission = '/sys/permission/delete',
 }
 
 /**
@@ -138,4 +144,41 @@ export function removeUserFromRole(sysUserRole: SysUserRole) {
 export function getUserListWithDepart(realName: string) {
   return get(Api.getUserListWithDepart, {'realName': realName})
 }
+
+/**
+ * 获取权限列表（树状）
+ */
+export function getPermissionListAsTree(serviceId: string, name: string) {
+  return get(Api.getPermissionListAsTree, {'serviceId': serviceId, 'name': name})
+}
+
+/**
+ * 校验权限
+ */
+export function validatePermission(param: string, paramType: string) {
+  return get(Api.validatePermission, {'validateParam': param, 'paramType': paramType})
+}
+
+/**
+ * 添加权限
+ */
+export function addPermission(sysPermission: Permission) {
+  return post(Api.addPermission, sysPermission)
+}
+
+/**
+ * 修改权限
+ */
+export function editPermission(sysPermission: Permission) {
+  return post(Api.editPermission, sysPermission)
+}
+
+/**
+ * 删除权限
+ */
+export function deletePermission(id: string) {
+  return post(Api.deletePermission + '?id=' + id)
+}
+
+
 

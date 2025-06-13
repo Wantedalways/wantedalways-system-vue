@@ -32,7 +32,6 @@
         @sort-change="handleSort"
         ref="roleTableRef"
       >
-<!--        <el-table-column type="index" label="序号" :index='index' />-->
         <el-table-column prop="roleType_dictText" label="类型" sortable="custom" />
         <el-table-column prop="roleName" label="名称" sortable="custom" />
         <el-table-column prop="roleCode" label="编码" sortable="custom" />
@@ -151,7 +150,7 @@
 </template>
 
 <script setup lang="ts">
-import {computed, onMounted, reactive, ref, watch} from "vue";
+import {computed, onActivated, reactive, ref, watch} from "vue";
 import {getDict} from "@/utils";
 import {DICT_ROLE_TYPE} from "@/constant/cache";
 import {ArrowDown, Plus, Refresh, Search} from "@element-plus/icons-vue";
@@ -429,7 +428,7 @@ function handleUser(id: string) {
   userDialogVisible.value = true
 }
 
-onMounted(() => {
+onActivated(() => {
   queryRoleList()
 })
 </script>
