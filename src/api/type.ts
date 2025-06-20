@@ -66,11 +66,18 @@ export interface Permission {
   url: string,
   component: string,
   icon: string,
-  sort: string,
+  sort: number,
   route: boolean,
   cache: boolean,
   hidden: boolean,
   affix: boolean,
   status: string,
   leaf: boolean,
+}
+
+// 部门添加和修改
+export interface Depart {
+  parentId: string,
+  departName: string,
+  workWxId: string,
 }

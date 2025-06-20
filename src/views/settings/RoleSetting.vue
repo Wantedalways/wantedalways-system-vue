@@ -3,12 +3,12 @@
     <el-row class="role-query-wrapper">
       <el-form inline @keyup.enter="queryRoleList" :model="roleQueryParams">
         <el-form-item label="角色类型">
-          <el-select v-model="roleQueryParams.roleType" style="width: 160px" clearable placeholder="请选择" @change="queryRoleList">
+          <el-select v-model="roleQueryParams.roleType" style="width: 200px" clearable placeholder="请选择" @change="queryRoleList">
             <el-option v-for="type in roleType" :key="type.value" :label="type.text" :value="type.value" />
           </el-select>
         </el-form-item>
         <el-form-item label="角色名称">
-          <el-input v-model="roleQueryParams.roleName" placeholder="角色名称" clearable />
+          <el-input v-model="roleQueryParams.roleName" placeholder="角色名称" clearable style="width: 200px" />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" :icon="Search" @click="queryRoleList">搜索</el-button>

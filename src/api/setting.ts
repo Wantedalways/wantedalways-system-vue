@@ -1,4 +1,5 @@
 import type {
+  Depart,
   Permission,
   PermissionForRole,
   Role,
@@ -31,6 +32,12 @@ enum Api {
   addPermission = '/sys/permission/add',
   editPermission = '/sys/permission/edit',
   deletePermission = '/sys/permission/delete',
+  validateDepart = '/sys/depart/validate',
+  addDepart = '/sys/depart/add',
+  editDepart = '/sys/depart/edit',
+  validateDeleteDepart = '/sys/depart/validateDeleteDepart',
+  deleteDepart = '/sys/depart/delete',
+  dragDepart = '/sys/depart/drag',
 }
 
 /**
@@ -178,6 +185,48 @@ export function editPermission(sysPermission: Permission) {
  */
 export function deletePermission(id: string) {
   return post(Api.deletePermission + '?id=' + id)
+}
+
+/**
+ * 校验部门
+ */
+export function validateDepart(param: string, paramType: string) {
+  return get(Api.validateDepart, {'validateParam': param, 'paramType': paramType})
+}
+
+/**
+ * 新增部门
+ */
+export function addDepart(depart: Depart) {
+  return post(Api.addDepart, depart)
+}
+
+/**
+ * 修改部门
+ */
+export function editDepart(depart: Depart) {
+  return post(Api.editDepart, depart)
+}
+
+/**
+ * 删除部门前验证，是否存在子部门和成员
+ */
+export function validateDeleteDepart(id: string) {
+  return get(Api.validateDeleteDepart, {'id': id})
+}
+
+/**
+ * 删除部门
+ */
+export function deleteDepart(id: string) {
+  return post(Api.deleteDepart+ '?id=' + id)
+}
+
+/**
+ * 拖拽部门
+ */
+export function dragDepart(data: any) {
+  return post(Api.dragDepart, data)
 }
 
 

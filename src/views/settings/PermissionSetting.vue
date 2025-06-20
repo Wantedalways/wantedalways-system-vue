@@ -1,9 +1,9 @@
 <template>
-  <div>
+  <div class="permission-container">
     <el-row class="permission-query-wrapper">
       <el-form inline :model="permissionQueryParams" @submit.prevent>
         <el-form-item label="权限名称">
-          <el-input v-model="permissionQueryParams.name" placeholder="权限名称" clearable
+          <el-input v-model="permissionQueryParams.name" placeholder="权限名称" clearable style="width: 200px"
                     @keyup.enter="queryPermissionList"/>
         </el-form-item>
         <el-form-item>
@@ -22,19 +22,25 @@
         stripe
         highlight-current-row
         table-layout="auto"
-        :header-cell-style="{'text-align': 'center'}"
-        :cell-style="{'text-align': 'center'}"
         class="permission-table"
         ref="permissionTableRef"
         row-key="id"
+        border
       >
-        <el-table-column prop="name" label="权限名称"/>
-        <el-table-column prop="code" label="编码"/>
-        <el-table-column prop="icon" label="图标"/>
+        <el-table-column prop="name" label="权限名称" width="170"/>
+        <el-table-column prop="code" label="编码" width="180"/>
+        <el-table-column label="图标" width="80" align="center" header-align="center">
+          <template #default="scope">
+            <el-icon v-if="scope.row.icon" style="vertical-align: middle">
+              <Component :is="scope.row.icon"/>
+            </el-icon>
+            <el-text v-else>/</el-text>
+          </template>
+        </el-table-column>
         <el-table-column prop="url" label="路径"/>
         <el-table-column prop="component" label="组件"/>
-        <el-table-column prop="sort" label="排序"/>
-        <el-table-column label="操作">
+        <el-table-column prop="sort" label="排序" width="80" align="center" header-align="center"/>
+        <el-table-column label="操作" width="160" align="center" header-align="center">
           <template #default="scope">
             <el-button size="small" text type="primary" @click="handleEditParams(scope.row)">修改</el-button>
             <el-dropdown class="button-more" trigger="click">
@@ -61,14 +67,15 @@
     </el-row>
   </div>
 
-  <el-dialog v-model="addDialogVisible" title="新增权限" @open="getPermissionSelectList">
-    <el-form :model="addParams" :rules="rules" hide-required-asterisk ref="addFormRef">
+  <el-dialog v-model="addDialogVisible" title="新增权限" @open="getPermissionSelectList" width="500" align-center>
+    <el-form :model="addParams" :rules="rules" hide-required-asterisk ref="addFormRef" class="permission-form"
+             label-position="right" label-width="auto">
       <el-form-item label="所属系统" prop="serviceId">
         <el-select v-model="addParams.serviceId">
           <el-option label="集成管理系统" value="1"/>
         </el-select>
       </el-form-item>
-      <el-form-item prop="type">
+      <el-form-item prop="type" label="权限类型">
         <el-radio-group v-model="addParams.type">
           <el-radio-button label="一级权限" value="0"/>
           <el-radio-button label="子权限" value="1"/>
@@ -93,7 +100,7 @@
       <el-form-item label="图标" prop="icon">
         <el-input v-model="addParams.icon" :prefix-icon="addParams.icon" readonly>
           <template #suffix>
-            <el-button :icon="CircleClose" v-if="addParams.icon" @click="addParams.icon = ''"/>
+            <el-button :icon="CircleClose" v-if="addParams.icon" @click="addParams.icon = ''" class="clear-button" circle />
           </template>
           <template #append>
             <el-button :icon="MoreFilled" @click="iconPickerVisible = true"/>
@@ -101,7 +108,7 @@
         </el-input>
       </el-form-item>
       <el-form-item label="排序" prop="sort">
-        <el-input v-model="addParams.sort"/>
+        <el-input-number v-model="addParams.sort" controls-position="right" :precision="2" :min="1" />
       </el-form-item>
       <el-form-item label="路由权限" prop="route">
         <el-switch v-model="addParams.route"/>
@@ -123,26 +130,27 @@
       </el-form-item>
     </el-form>
     <template #footer>
-      <el-button @click="addDialogVisible = false" class="role-modify-button">取消</el-button>
-      <el-button type="primary" @click="handleAddPermission" class="role-modify-button">确认</el-button>
+      <el-button @click="addDialogVisible = false" class="permission-modify-button">取消</el-button>
+      <el-button type="primary" @click="handleAddPermission" class="permission-modify-button">确认</el-button>
     </template>
-  </el-dialog>
+  </el-dialog >
 
-  <el-dialog v-model="editDialogVisible" title="修改权限" @open="getPermissionSelectList">
-    <el-form :model="editParams" :rules="rules" hide-required-asterisk ref="editFormRef">
+  <el-dialog v-model="editDialogVisible" title="修改权限" @open="getPermissionSelectList"  width="500" align-center>
+    <el-form :model="editParams" :rules="rules" hide-required-asterisk ref="editFormRef" class="permission-form"
+             label-position="right" label-width="auto">
       <el-form-item label="所属系统" prop="serviceId">
         <el-select v-model="editParams.serviceId">
           <el-option label="集成管理系统" value="1"/>
         </el-select>
       </el-form-item>
       <el-form-item prop="type">
-        <el-radio-group v-model="editParams.type">
+        <el-radio-group v-model="editParams.type" label="权限类型">
           <el-radio-button label="一级权限" value="0"/>
           <el-radio-button label="子权限" value="1"/>
           <el-radio-button label="按钮权限" value="2"/>
         </el-radio-group>
       </el-form-item>
-      <el-form-item label="上级权限" prop="parentId" v-show="editParams.type !== '0'">
+      <el-form-item label="上级权限" prop="parentId" v-if="editParams.type !== '0'">
         <el-tree-select v-model="editParams.parentId" :data="permissionSelectList" check-strictly/>
       </el-form-item>
       <el-form-item label="权限名称" prop="name">
@@ -160,7 +168,7 @@
       <el-form-item label="图标" prop="icon">
         <el-input v-model="editParams.icon" :prefix-icon="editParams.icon" readonly>
           <template #suffix>
-            <el-button :icon="CircleClose" v-if="editParams.icon" @click="editParams.value.icon = ''"/>
+            <el-button :icon="CircleClose" v-if="editParams.icon" @click="editParams.value.icon = ''" class="clear-button" circle />
           </template>
           <template #append>
             <el-button :icon="MoreFilled" @click="iconPickerVisible = true"/>
@@ -168,7 +176,7 @@
         </el-input>
       </el-form-item>
       <el-form-item label="排序" prop="sort">
-        <el-input v-model="editParams.sort"/>
+        <el-input-number v-model="editParams.sort" controls-position="right" :precision="2" :min="1" />
       </el-form-item>
       <el-form-item label="路由权限" prop="route">
         <el-switch v-model="editParams.route"/>
@@ -190,8 +198,8 @@
       </el-form-item>
     </el-form>
     <template #footer>
-      <el-button @click="editDialogVisible = false" class="role-modify-button">取消</el-button>
-      <el-button type="primary" @click="handleEditPermission" class="role-modify-button">确认</el-button>
+      <el-button @click="editDialogVisible = false" class="permission-modify-button">取消</el-button>
+      <el-button type="primary" @click="handleEditPermission" class="permission-modify-button">确认</el-button>
     </template>
   </el-dialog>
 
@@ -275,7 +283,7 @@ const addParams = ref({
   url: '',
   component: "",
   icon: '',
-  sort: '',
+  sort: null,
   route: true,
   cache: true,
   hidden: false,
@@ -294,7 +302,7 @@ const editParams = ref({
   url: '',
   component: "",
   icon: '',
-  sort: '',
+  sort: null,
   route: true,
   cache: true,
   hidden: false,
@@ -308,7 +316,7 @@ const editValidateParams = {
   code: '',
   url: '',
   component: '',
-  sort: ''
+  sort: null
 }
 
 watchEffect(() => {
@@ -320,12 +328,13 @@ const iconPickerVisible = ref(false);
 
 const rules = reactive<FormRules<Permission>>({
   serviceId: [{required: true, message: '请选择所属系统', trigger: 'blur'}],
-  parentId: [{required: true, message: '请选择所属系统', trigger: 'blur'}],
+  parentId: [{required: true, message: '请选择上级权限', trigger: 'blur'}],
   name: [{validator: validateName, trigger: 'blur'}],
   code: [{validator: validateCode, trigger: 'blur'}],
   url: [{validator: validateUrl, trigger: 'blur'}],
   component: [{validator: validateComponent, trigger: 'blur'}],
-  sort: [{validator: validateSort, trigger: 'blur'}]
+  // sort: [{validator: validateSort, trigger: 'blur'}]
+  sort: [{required: true, message: '请输入排序', trigger: 'blur'}],
 })
 
 async function validateName(rule: any, value: any, callback: any) {
@@ -396,11 +405,11 @@ async function validateComponent(rule: any, value: any, callback: any) {
   }
 }
 
-async function validateSort(rule: any, value: any, callback: any) {
-  if (value === '') {
-    callback(new Error('请输入前端组件'));
+/*async function validateSort(rule: any, value: any, callback: any) {
+  if (value === null) {
+    callback(new Error('请输入排序'));
   } else {
-    if (editValidateParams.sort === '' || editValidateParams.sort !== editParams.value.sort) {
+    if (editValidateParams.sort === null || editValidateParams.sort !== editParams.value.sort) {
       const result = await validatePermission(value, 'sort');
       if (!result.success) {
         callback(new Error(result.message));
@@ -411,7 +420,7 @@ async function validateSort(rule: any, value: any, callback: any) {
       callback()
     }
   }
-}
+}*/
 
 const permissionSelectList = ref([])
 
@@ -425,6 +434,7 @@ async function getPermissionSelectList() {
 }
 
 const editDialogVisible = ref(false)
+
 function handleEditParams(data: any) {
   editParams.value = {
     id: data.id,
@@ -445,8 +455,15 @@ function handleEditParams(data: any) {
     leaf: data.item.leaf
   }
 
+  editValidateParams.name = data.name;
+  editValidateParams.code = data.code;
+  editValidateParams.url = data.url;
+  editValidateParams.component = data.component;
+  editValidateParams.sort = data.sort;
+
   editDialogVisible.value = true
 }
+
 const editFormRef = ref()
 /**
  * 修改权限
@@ -473,6 +490,7 @@ function handleAddChild(data: any) {
   addParams.value.serviceId = data.item.serviceId.toString();
   addParams.value.parentId = data.id
   addParams.value.type = '1'
+  addParams.value.url = data.url
 
   addDialogVisible.value = true
 }
@@ -488,7 +506,7 @@ watch(addDialogVisible, (value) => {
       url: '',
       component: "",
       icon: '',
-      sort: '',
+      sort: null,
       route: true,
       cache: true,
       hidden: false,
@@ -512,7 +530,8 @@ const handleDelete = useDebounceFn((data) => {
     } else {
       ElMessage.error(result.message)
     }
-  }).catch(() => {})
+  }).catch(() => {
+  })
 })
 
 onActivated(() => {
@@ -527,5 +546,31 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.permission-container {
 
+  .permission-query-wrapper {
+    border-bottom: 1px solid var(--el-menu-border-color);
+    margin-bottom: 10px;
+  }
+
+  .permission-button-wrapper {
+    margin-bottom: 5px;
+
+    .el-button {
+      width: 100px;
+    }
+  }
+}
+
+.permission-form {
+  padding: 20px 5px 0 5px;
+
+  .clear-button {
+    border: none;
+  }
+}
+
+.permission-modify-button {
+  width: 80px;
+}
 </style>
