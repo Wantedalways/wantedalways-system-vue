@@ -1,5 +1,5 @@
-import {get, post} from "@/api/index";
-import type {LoginModel} from "@/stores/type";
+import { get, post } from '@/api/index'
+import type { LoginModel } from '@/stores/type'
 
 enum Api {
   // 获取验证码
@@ -9,7 +9,7 @@ enum Api {
   // 退出登录
   logout = '/sys/login/logout',
   // 获取权限目录
-  getMenu = '/sys/permission/getPermissionMenu'
+  getMenu = '/sys/permission/getPermissionMenu',
 }
 
 /**
@@ -17,7 +17,7 @@ enum Api {
  * @param checkKey 验证码key
  */
 export function getCaptcha(checkKey: string) {
-  return get(Api.getCaptcha, {'key': checkKey})
+  return get(Api.getCaptcha, { key: checkKey })
 }
 
 /**
@@ -32,7 +32,7 @@ export function accountLogin(loginModel: LoginModel) {
  * 退出登录
  */
 export function logout() {
-    return post(Api.logout)
+  return post(Api.logout)
 }
 
 /**
@@ -40,5 +40,5 @@ export function logout() {
  * @param serviceId 服务id
  */
 export function getMenu(serviceId: number) {
-  return get(Api.getMenu, {'serviceId': serviceId})
+  return get(Api.getMenu, { serviceId: serviceId })
 }

@@ -1,9 +1,5 @@
 <template>
-  <el-dialog
-    v-model="visible"
-    title="选择图标"
-    width="60%"
-  >
+  <el-dialog v-model="visible" title="选择图标" width="60%">
     <el-input
       v-model="searchText"
       placeholder="搜索图标..."
@@ -36,7 +32,7 @@
 </template>
 
 <script setup lang="ts">
-import {computed, ref} from 'vue'
+import { computed, ref } from 'vue'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 
 const props = defineProps(['modelValue', 'visible'])
@@ -50,16 +46,16 @@ const visible = computed({
     return props.visible
   },
   set(val) {
-    emit("update:visible", val)
-  }
+    emit('update:visible', val)
+  },
 })
 const modelValue = computed({
   get() {
     return props.modelValue
   },
   set(val) {
-    emit("update:modelValue", val)
-  }
+    emit('update:modelValue', val)
+  },
 })
 const searchText = ref('')
 const selectedIcon = ref(modelValue.value || '')
@@ -67,12 +63,12 @@ const selectedIcon = ref(modelValue.value || '')
 // 过滤图标
 const filteredIcons = computed(() => {
   return allIcons.filter(icon =>
-    icon.toLowerCase().includes(searchText.value.toLowerCase())
+    icon.toLowerCase().includes(searchText.value.toLowerCase()),
   )
 })
 
 // 选择图标
-const handleSelect = (icon) => {
+const handleSelect = icon => {
   selectedIcon.value = icon
 }
 
@@ -85,7 +81,7 @@ const confirmSelection = () => {
 
 <script lang="ts">
 export default {
-  name: "IconPicker",
+  name: 'IconPicker',
 }
 </script>
 

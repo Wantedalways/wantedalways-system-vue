@@ -1,11 +1,11 @@
-import {defineStore} from "pinia";
+import { defineStore } from 'pinia'
 
 const useAppStore = defineStore('app', {
   state() {
     return {
       visitedTags: [],
       cachedTags: ['blankLayout'],
-      refreshFlag: true
+      refreshFlag: true,
     }
   },
   actions: {
@@ -88,8 +88,8 @@ const useAppStore = defineStore('app', {
           break
         }
       }
-    }
-  }
+    },
+  },
 })
 
 export default useAppStore

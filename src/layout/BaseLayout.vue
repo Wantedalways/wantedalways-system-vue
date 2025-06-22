@@ -2,7 +2,7 @@
   <div class="app-wrapper">
     <div class="app-container">
       <div class="navbar">
-        <nav-bar/>
+        <nav-bar />
       </div>
       <el-container class="app-main">
         <div class="sidebar">
@@ -22,11 +22,10 @@
 </template>
 
 <script setup lang="ts">
-
-import SideBar from "@/layout/sidebar/SideBar.vue";
-import NavBar from "@/layout/navbar/NavBar.vue";
-import HeaderTag from "@/layout/tag/HeaderTag.vue";
-import AppMain from "@/layout/main/AppMain.vue";
+import SideBar from '@/layout/sidebar/SideBar.vue'
+import NavBar from '@/layout/navbar/NavBar.vue'
+import HeaderTag from '@/layout/tag/HeaderTag.vue'
+import AppMain from '@/layout/main/AppMain.vue'
 </script>
 
 <style scoped lang="scss">
@@ -48,16 +47,19 @@ import AppMain from "@/layout/main/AppMain.vue";
       padding: 20px 0 20px 20px;
       min-width: $sidebarWidth;
       border-right: 1px solid var(--el-menu-border-color);
-      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .12), 0 0 3px 0 rgba(0, 0, 0, .04);
+      box-shadow:
+        0 1px 3px 0 rgba(0, 0, 0, 0.12),
+        0 0 3px 0 rgba(0, 0, 0, 0.04);
     }
 
     .app-content {
-
       .tags {
         height: 34px;
         padding: 0 20px;
         border-bottom: 1px solid #d8dce5;
-        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .12), 0 0 3px 0 rgba(0, 0, 0, .04);
+        box-shadow:
+          0 1px 3px 0 rgba(0, 0, 0, 0.12),
+          0 0 3px 0 rgba(0, 0, 0, 0.04);
       }
 
       .content {
@@ -66,5 +68,4 @@ import AppMain from "@/layout/main/AppMain.vue";
     }
   }
 }
-
 </style>

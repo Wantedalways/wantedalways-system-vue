@@ -3,19 +3,15 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted} from "vue";
+import { onMounted } from 'vue'
 
-onMounted(() => {
-
-})
+onMounted(() => {})
 </script>
 
 <script lang="ts">
 export default {
-  name: "UserSetting",
+  name: 'UserSetting',
 }
 </script>
 
-<style scoped lang="scss">
-
-</style>
+<style scoped lang="scss"></style>

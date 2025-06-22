@@ -1,36 +1,54 @@
 <template>
-  <el-drawer v-model="drawerVisible" title="权限列表" :show-close="false" ref="permissionDrawerRef"
-             :before-close="handleClose" class="permission_drawer">
+  <el-drawer
+    v-model="drawerVisible"
+    title="权限列表"
+    :show-close="false"
+    ref="permissionDrawerRef"
+    :before-close="handleClose"
+    class="permission_drawer"
+  >
     <div class="tool-wrapper">
-      <el-input v-model="treeQueryParam" placeholder="权限名称" :prefix-icon="Search" clearable class="search" />
-      <el-checkbox @change="handleCheckAll" v-model="checkAll" :indeterminate="isIndeterminate" class="check-all">全选
+      <el-input
+        v-model="treeQueryParam"
+        placeholder="权限名称"
+        :prefix-icon="Search"
+        clearable
+        class="search"
+      />
+      <el-checkbox
+        @change="handleCheckAll"
+        v-model="checkAll"
+        :indeterminate="isIndeterminate"
+        class="check-all"
+        >全选
       </el-checkbox>
-      <el-divider direction="vertical" class="divider"/>
+      <el-divider direction="vertical" class="divider" />
       <el-text @click="handleExpand" class="expand">
         <el-icon>
-          <ArrowUpBold v-if="isExpand"/>
-          <ArrowDownBold v-else/>
+          <ArrowUpBold v-if="isExpand" />
+          <ArrowDownBold v-else />
         </el-icon>
         &nbsp;{{ isExpand ? '收起' : '展开' }}全部&nbsp;
       </el-text>
     </div>
-<!--    <el-text class="tree-title" tag="b">当前权限</el-text>-->
-    <el-tree :data="permissionTreeData"
-             show-checkbox
-             node-key="id"
-             :default-checked-keys="checkedKeys"
-             :default-expanded-keys="expandKeys"
-             ref="permissionTreeRef"
-             check-strictly
-             @check="handleTreeCheck"
-             :filter-node-method="treeFilter"
-             class="tree"
+    <!--    <el-text class="tree-title" tag="b">当前权限</el-text>-->
+    <el-tree
+      :data="permissionTreeData"
+      show-checkbox
+      node-key="id"
+      :default-checked-keys="checkedKeys"
+      :default-expanded-keys="expandKeys"
+      ref="permissionTreeRef"
+      check-strictly
+      @check="handleTreeCheck"
+      :filter-node-method="treeFilter"
+      class="tree"
     >
-      <template #default="{node, data}">
-        <el-text :class="{'is_matched': data.isMatched}" class="tree-node-span">
+      <template #default="{ node, data }">
+        <el-text :class="{ is_matched: data.isMatched }" class="tree-node-span">
           {{ node.label }}
           <el-icon v-show="data.isMatched">
-            <Star/>
+            <Star />
           </el-icon>
         </el-text>
       </template>
@@ -38,30 +56,37 @@
     <div class="button-wrapper">
       <el-button @click="closeDrawer">取消</el-button>
       <el-button type="primary" plain @click="handleSave">仅保存</el-button>
-      <el-button type="primary" @click="handleSaveAndClose">保存并关闭</el-button>
+      <el-button type="primary" @click="handleSaveAndClose"
+        >保存并关闭</el-button
+      >
     </div>
   </el-drawer>
 </template>
 
 <script setup lang="ts">
-import {computed, onMounted, reactive, ref, watch} from "vue";
-import {getAllPermissionAsTree, setPermissionForRole} from "@/api/setting";
-import {ElMessage} from "element-plus";
-import {ArrowDownBold, ArrowUpBold, Search, Star} from "@element-plus/icons-vue";
-import type {PermissionForRole} from "@/api/type";
+import { computed, onMounted, reactive, ref, watch } from 'vue'
+import { getAllPermissionAsTree, setPermissionForRole } from '@/api/setting'
+import { ElMessage } from 'element-plus'
+import {
+  ArrowDownBold,
+  ArrowUpBold,
+  Search,
+  Star,
+} from '@element-plus/icons-vue'
+import type { PermissionForRole } from '@/api/type'
 
-const props = defineProps(['visible', 'roleId', 'ownedIds']);
-const emit = defineEmits(["update:visible", 'update:ownedIds'])
+const props = defineProps(['visible', 'roleId', 'ownedIds'])
+const emit = defineEmits(['update:visible', 'update:ownedIds'])
 const drawerVisible = computed({
   get() {
     return props.visible
   },
   set(val) {
-    emit("update:visible", val)
-  }
+    emit('update:visible', val)
+  },
 })
 
-const checkAll = ref(false);
+const checkAll = ref(false)
 const isExpand = ref(false)
 
 const permissionTreeData = reactive([])
@@ -71,23 +96,26 @@ const expandKeys = ref([])
 const permissionTreeRef = ref()
 const isIndeterminate = ref(false)
 
-watch(() => props.ownedIds, (newVal) => {
-  checkedKeys.value = newVal
-  expandKeys.value = newVal
-  if (checkedKeys.value.length === 0) {
-    checkAll.value = false
-    isIndeterminate.value = false
-    isExpand.value = false
-  } else if (checkedKeys.value.length === allIds.value.length) {
-    checkAll.value = true
-    isIndeterminate.value = false
-    isExpand.value = true
-  } else {
-    checkAll.value = false
-    isIndeterminate.value = true
-    isExpand.value = true
-  }
-})
+watch(
+  () => props.ownedIds,
+  newVal => {
+    checkedKeys.value = newVal
+    expandKeys.value = newVal
+    if (checkedKeys.value.length === 0) {
+      checkAll.value = false
+      isIndeterminate.value = false
+      isExpand.value = false
+    } else if (checkedKeys.value.length === allIds.value.length) {
+      checkAll.value = true
+      isIndeterminate.value = false
+      isExpand.value = true
+    } else {
+      checkAll.value = false
+      isIndeterminate.value = true
+      isExpand.value = true
+    }
+  },
+)
 
 /**
  * 获取权限树状数据
@@ -122,7 +150,7 @@ function treeFilter(value: string, data, node) {
   return false
 }
 
-watch(treeQueryParam, (val) => {
+watch(treeQueryParam, val => {
   permissionTreeRef.value.filter(val)
 })
 
@@ -146,7 +174,7 @@ async function handleSave() {
   const data: PermissionForRole = {
     roleId: props.roleId,
     newPermissionIds: checkedKeys.value,
-    oldPermissionIds: propsOwnedIds
+    oldPermissionIds: propsOwnedIds,
   }
   const result = await setPermissionForRole(data)
   if (result.success) {
@@ -209,7 +237,10 @@ function handleExpand() {
 function handleTreeCheck() {
   checkedKeys.value = permissionTreeRef.value.getCheckedKeys()
   checkAll.value = checkedKeys.value.length === allIds.value.length
-  isIndeterminate.value = checkedKeys.value.length === 0 ? false : checkedKeys.value.length !== allIds.value.length
+  isIndeterminate.value =
+    checkedKeys.value.length === 0
+      ? false
+      : checkedKeys.value.length !== allIds.value.length
 }
 
 onMounted(() => {
@@ -219,7 +250,7 @@ onMounted(() => {
 
 <script lang="ts">
 export default {
-  name: "PermissionDrawer",
+  name: 'PermissionDrawer',
 }
 </script>
 
@@ -257,7 +288,7 @@ export default {
 }
 
 .tool-wrapper:after {
-  content: "";
+  content: '';
   position: absolute;
   bottom: 0;
   left: 12px;
@@ -282,8 +313,6 @@ export default {
   }
 }
 
-
-
 .button-wrapper {
   position: absolute;
   bottom: 20px;
@@ -300,7 +329,7 @@ export default {
     margin-bottom: 0;
     padding-bottom: 20px;
     //border-bottom: 1px solid var(--el-menu-border-color);
-    box-shadow: 2px 2px 3px 0 rgba(0, 0, 0, .3);
+    box-shadow: 2px 2px 3px 0 rgba(0, 0, 0, 0.3);
   }
 }
 </style>

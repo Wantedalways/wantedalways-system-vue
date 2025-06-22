@@ -1,13 +1,14 @@
 <template>
-  <el-dialog v-model="visible"
-             :title="title"
-             class="dialog-container"
-             @close="handleClose"
-             @closed="handleAfterClose"
-             :show-close="false"
-             draggable
-             ref="dialogRef"
-             align-center
+  <el-dialog
+    v-model="visible"
+    :title="title"
+    class="dialog-container"
+    @close="handleClose"
+    @closed="handleAfterClose"
+    :show-close="false"
+    draggable
+    ref="dialogRef"
+    align-center
   >
     <div class="body">
       <div class="tree-container">
@@ -16,55 +17,73 @@
       <div class="selected-wrapper">
         <el-text>已选择{{ type }}</el-text>
         <el-scrollbar class="selected-scrollbar">
-          <div v-for="item in selectedItems" :key="item.id" class="selected-item">
+          <div
+            v-for="item in selectedItems"
+            :key="item.id"
+            class="selected-item"
+          >
             <el-icon class="selected-icon">
               <Management v-if="!item.userFlag" />
               <UserFilled v-if="item.userFlag" />
             </el-icon>
-            <el-text class="selected-label">{{item.label}}</el-text>
-            <el-icon @click="handleRemoveItem(item.id)" class="selected-close"><CloseBold /></el-icon>
+            <el-text class="selected-label">{{ item.label }}</el-text>
+            <el-icon @click="handleRemoveItem(item.id)" class="selected-close"
+              ><CloseBold
+            /></el-icon>
           </div>
         </el-scrollbar>
       </div>
     </div>
     <div class="footer">
       <el-button @click="handleCancel" class="footer-button">取消</el-button>
-      <el-button type="primary" @click="handleSave" class="footer-button">确认</el-button>
+      <el-button type="primary" @click="handleSave" class="footer-button"
+        >确认</el-button
+      >
     </div>
   </el-dialog>
 </template>
 
 <script setup lang="ts">
-import {computed, ref} from "vue";
-import {CloseBold, Management, UserFilled} from "@element-plus/icons-vue";
+import { computed, ref } from 'vue'
+import { CloseBold, Management, UserFilled } from '@element-plus/icons-vue'
 
-const props = defineProps(["visible", 'title', 'selectedItems', 'resultItems', 'type']);
-const emit = defineEmits(["update:visible", "update:selectedItems", 'update:resultItems']);
+const props = defineProps([
+  'visible',
+  'title',
+  'selectedItems',
+  'resultItems',
+  'type',
+])
+const emit = defineEmits([
+  'update:visible',
+  'update:selectedItems',
+  'update:resultItems',
+])
 const visible = computed({
   get() {
-    return props.visible;
+    return props.visible
   },
   set(val) {
-    emit("update:visible", val);
-  }
+    emit('update:visible', val)
+  },
 })
 const selectedItems = computed({
   get() {
-    return props.selectedItems;
+    return props.selectedItems
   },
   set(val) {
-    emit("update:selectedItems", val);
-  }
+    emit('update:selectedItems', val)
+  },
 })
 
 const resultItems = computed({
   get() {
-    return props.resultItems;
+    return props.resultItems
   },
   set(val) {
-    emit("update:resultItems", val);
-  }
-});
+    emit('update:resultItems', val)
+  },
+})
 
 const isConfirm = ref(false)
 /**
@@ -78,8 +97,8 @@ function handleRemoveItem(id: string) {
  * 取消选择
  */
 function handleCancel() {
-  isConfirm.value = false;
-  visible.value = false;
+  isConfirm.value = false
+  visible.value = false
 }
 
 const dialogRef = ref()
@@ -88,7 +107,7 @@ const dialogRef = ref()
  */
 function handleClose() {
   if (!isConfirm.value) {
-    selectedItems.value = [];
+    selectedItems.value = []
   }
 }
 
@@ -108,21 +127,19 @@ function handleSave() {
     return
   }*/
   resultItems.value = [...selectedItems.value]
-  isConfirm.value = true;
+  isConfirm.value = true
   visible.value = false
 }
 </script>
 
 <script lang="ts">
 export default {
-  name: "TreeDialog",
+  name: 'TreeDialog',
 }
 </script>
 
 <style scoped lang="scss">
 .dialog-container {
-
-
   .body {
     display: flex;
     flex-grow: 1;
@@ -135,7 +152,7 @@ export default {
 
     .selected-wrapper {
       width: 45%;
-      padding: 5px 14px 10px 20px ;
+      padding: 5px 14px 10px 20px;
       border-left: 1px solid var(--el-menu-border-color);
       height: 340px;
 
@@ -183,14 +200,13 @@ export default {
     }
   }
 }
-
 </style>
 
 <style lang="scss">
 .dialog-container {
   display: flex;
   flex-direction: column;
-  width:600px;
+  width: 600px;
   height: 500px;
   padding: 0;
 

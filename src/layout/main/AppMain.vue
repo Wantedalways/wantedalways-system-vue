@@ -9,25 +9,27 @@
 </template>
 
 <script setup lang="ts">
-import useAppStore from "@/stores/modules/app";
-import {nextTick, ref, watch} from "vue";
+import useAppStore from '@/stores/modules/app'
+import { nextTick, ref, watch } from 'vue'
 
 const appStore = useAppStore()
 const flag = ref(true)
 
 const cached = appStore.cachedTags
 
-watch(() => appStore.refreshFlag, () => {
-  flag.value = false
-  nextTick(() => {
-    flag.value = true
-  })
-})
-
+watch(
+  () => appStore.refreshFlag,
+  () => {
+    flag.value = false
+    nextTick(() => {
+      flag.value = true
+    })
+  },
+)
 </script>
 
 <style scoped lang="scss">
-  .main-container {
-    height: 100%;
-  }
+.main-container {
+  height: 100%;
+}
 </style>

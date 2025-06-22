@@ -1,14 +1,12 @@
 // vite.config.ts
-import {fileURLToPath, URL} from "node:url";
+import { fileURLToPath, URL } from 'node:url'
 import {
   defineConfig,
-  loadEnv
-} from "file:///E:/VueProjects/wantedalways-system-vue/node_modules/vite/dist/node/index.js";
-import vue from "file:///E:/VueProjects/wantedalways-system-vue/node_modules/@vitejs/plugin-vue/dist/index.mjs";
-import {
-  createSvgIconsPlugin
-} from "file:///E:/VueProjects/wantedalways-system-vue/node_modules/vite-plugin-svg-icons/dist/index.mjs";
-import path from "path";
+  loadEnv,
+} from 'file:///E:/VueProjects/wantedalways-system-vue/node_modules/vite/dist/node/index.js'
+import vue from 'file:///E:/VueProjects/wantedalways-system-vue/node_modules/@vitejs/plugin-vue/dist/index.mjs'
+import { createSvgIconsPlugin } from 'file:///E:/VueProjects/wantedalways-system-vue/node_modules/vite-plugin-svg-icons/dist/index.mjs'
+import path from 'path'
 
 var __vite_injected_original_import_meta_url = "file:///E:/VueProjects/wantedalways-system-vue/vite.config.ts";
 var vite_config_default = defineConfig(({ mode }) => {

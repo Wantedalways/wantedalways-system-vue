@@ -1,5 +1,10 @@
 <template>
-  <el-scrollbar class="tags-container" ref="tagsContainer" @wheel="handleScroll" @scroll="closeMenu">
+  <el-scrollbar
+    class="tags-container"
+    ref="tagsContainer"
+    @wheel="handleScroll"
+    @scroll="closeMenu"
+  >
     <div class="tags-content">
       <el-tag
         v-for="tag in visitedTags"
@@ -9,34 +14,44 @@
         @click.middle="isAffix(tag) ? '' : closeSelectedTag(tag)"
         @contextmenu.prevent="openMenu(tag, $event)"
         class="tag-item"
-        :class="{'active': isActive(tag)}"
+        :class="{ active: isActive(tag) }"
         :type="isActive(tag) ? 'primary' : 'info'"
         :effect="isActive(tag) ? 'dark' : 'plain'"
         ref="tags"
-        v-bind="{'tagData': tag}"
+        v-bind="{ tagData: tag }"
       >
-        <router-link :to="{ path: tag.path, query: tag.query}" custom v-slot="{navigate}">
+        <router-link
+          :to="{ path: tag.path, query: tag.query }"
+          custom
+          v-slot="{ navigate }"
+        >
           <span @click="navigate">{{ tag.meta.title }}</span>
         </router-link>
       </el-tag>
     </div>
   </el-scrollbar>
 
-  <ul v-show="menuVisible" :style="{left: menuLeft + 'px', top: menuTop + 'px'}" class="contextmenu">
+  <ul
+    v-show="menuVisible"
+    :style="{ left: menuLeft + 'px', top: menuTop + 'px' }"
+    class="contextmenu"
+  >
     <li @click="reload(selectedTag)">刷新</li>
-    <li v-show="!isAffix(selectedTag)" @click="closeSelectedTag(selectedTag)">关闭</li>
+    <li v-show="!isAffix(selectedTag)" @click="closeSelectedTag(selectedTag)">
+      关闭
+    </li>
     <li @click="closeOthers(selectedTag)">关闭其他</li>
     <li @click="closeAll(selectedTag)">关闭所有</li>
   </ul>
 </template>
 
 <script setup lang="ts">
-import useAppStore from "@/stores/modules/app";
-import {useRoute, useRouter} from "vue-router";
-import {computed, nextTick, onMounted, ref, watch} from "vue";
-import usePermissionStore from "@/stores/modules/permission";
-import path from "path-browserify";
-import {ElScrollbar} from "element-plus";
+import useAppStore from '@/stores/modules/app'
+import { useRoute, useRouter } from 'vue-router'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import usePermissionStore from '@/stores/modules/permission'
+import path from 'path-browserify'
+import { ElScrollbar } from 'element-plus'
 
 const appStore = useAppStore()
 const visitedTags = computed(() => appStore.visitedTags)
@@ -47,7 +62,7 @@ let affix = []
  */
 function initTags() {
   const permissionStore = usePermissionStore()
-  const affixTags = affix = filterAffixTags(permissionStore.routes)
+  const affixTags = (affix = filterAffixTags(permissionStore.routes))
   for (const tag of affixTags) {
     if (tag.name) {
       appStore.addVisitedTag(tag)
@@ -67,7 +82,7 @@ function filterAffixTags(routes, basePath = '/') {
         fullPath: tagPath,
         path: tagPath,
         name: route.name,
-        meta: {...route.meta}
+        meta: { ...route.meta },
       })
     }
     if (route.children) {
@@ -87,7 +102,7 @@ const router = useRouter()
  * 添加标签
  */
 async function addTag() {
-  const {name, meta} = route
+  const { name, meta } = route
   if (name) {
     await appStore.addVisitedTag(route)
     if (meta && meta.cache) {
@@ -190,7 +205,9 @@ async function closeAll(tag) {
  */
 function handleScroll(e) {
   const eventDelta = -e.wheelDelta || -e.deltaY * 40
-  tagsContainer.value!.setScrollLeft(tagsContainer.value.wrapRef.scrollLeft + eventDelta / 4)
+  tagsContainer.value!.setScrollLeft(
+    tagsContainer.value.wrapRef.scrollLeft + eventDelta / 4,
+  )
 }
 
 const tags = ref()
@@ -223,7 +240,8 @@ function scrollToTarget(targetTag) {
 
     const tagSpacing = 5
     const beforePreTagOffsetLeft = preTag.$el.offsetLeft - tagSpacing
-    const afterNextTagOffsetLeft = nextTag.$el.offsetLeft + nextTag.$el.offsetWidth + tagSpacing
+    const afterNextTagOffsetLeft =
+      nextTag.$el.offsetLeft + nextTag.$el.offsetWidth + tagSpacing
     if (afterNextTagOffsetLeft > wrap.scrollLeft + containerWidth) {
       wrap.scrollLeft = afterNextTagOffsetLeft - containerWidth
     } else if (beforePreTagOffsetLeft < wrap.scrollLeft) {
@@ -258,7 +276,7 @@ watch(route, () => {
 /**
  * 点击任意位置关闭右键菜单
  */
-watch(menuVisible, (value) => {
+watch(menuVisible, value => {
   if (value) {
     document.addEventListener('click', closeMenu)
   } else {
@@ -314,7 +332,7 @@ onMounted(() => {
   font-size: 12px;
   font-weight: 400;
   color: #333;
-  box-shadow: 2px 2px 3px 0 rgba(0, 0, 0, .3);
+  box-shadow: 2px 2px 3px 0 rgba(0, 0, 0, 0.3);
 
   li {
     margin: 0;

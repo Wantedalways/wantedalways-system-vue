@@ -1,27 +1,27 @@
-import {fileURLToPath, URL} from 'node:url'
+import { fileURLToPath, URL } from 'node:url'
 
-import {defineConfig, loadEnv} from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 
 // svg
-import {createSvgIconsPlugin} from "vite-plugin-svg-icons";
-import path from "path";
+import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
+import path from 'path'
 
 // https://vite.dev/config/
-export default defineConfig(({mode}) => {
-  const env = loadEnv(mode, process.cwd());
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd())
   return {
     plugins: [
       vue(),
       createSvgIconsPlugin({
         iconDirs: [path.resolve(process.cwd(), 'src/assets/icons')],
         symbolId: 'icon-[dir]-[name]',
-      })
+      }),
     ],
     resolve: {
       alias: {
-        '@': fileURLToPath(new URL('./src', import.meta.url))
-      }
+        '@': fileURLToPath(new URL('./src', import.meta.url)),
+      },
     },
     css: {
       preprocessorOptions: {
@@ -30,8 +30,8 @@ export default defineConfig(({mode}) => {
           silenceDeprecations: ['legacy-js-api'],
           javascriptEnabled: true,
           additionalData: '@import "./src/style/variable.scss";',
-        }
-      }
+        },
+      },
     },
     //代理跨域
     server: {
@@ -42,9 +42,9 @@ export default defineConfig(({mode}) => {
           //需要代理跨域
           changeOrigin: true,
           //路径重写
-          rewrite: (path) => path.replace(/^\/api/, ''),
-        }
-      }
-    }
+          rewrite: path => path.replace(/^\/api/, ''),
+        },
+      },
+    },
   }
 })

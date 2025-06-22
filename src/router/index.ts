@@ -1,6 +1,6 @@
-import {createRouter, createWebHistory} from 'vue-router'
-import LoginView from "@/views/login/LoginView.vue";
-import setupPermissionGuard from "@/router/guard/permission";
+import { createRouter, createWebHistory } from 'vue-router'
+import LoginView from '@/views/login/LoginView.vue'
+import setupPermissionGuard from '@/router/guard/permission'
 
 export const constantRoutes = [
   {
@@ -9,30 +9,28 @@ export const constantRoutes = [
     component: LoginView,
     hidden: true,
     meta: {
-      title: '登录'
-    }
+      title: '登录',
+    },
   },
   {
     path: '/404',
     component: () => import('@/views/exception/Page404View.vue'),
     meta: {
-      title: '404'
-    }
+      title: '404',
+    },
   },
   {
     path: '/:pathMatch(.*)*',
     redirect: '/404',
     hidden: true,
-  }
+  },
 ]
 
-export const baseRoutes = [
-
-]
+export const baseRoutes = []
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes: constantRoutes
+  routes: constantRoutes,
 })
 
 setupPermissionGuard(router)

@@ -9,19 +9,22 @@
 </template>
 
 <script setup lang="ts">
-import useAppStore from "@/stores/modules/app";
-import {nextTick, ref, watch} from "vue";
+import useAppStore from '@/stores/modules/app'
+import { nextTick, ref, watch } from 'vue'
 
 const appStore = useAppStore()
 const cached = appStore.cachedTags
 
 const flag = ref(true)
-watch(() => appStore.refreshFlag, () => {
-  flag.value = false
-  nextTick(() => {
-    flag.value = true
-  })
-})
+watch(
+  () => appStore.refreshFlag,
+  () => {
+    flag.value = false
+    nextTick(() => {
+      flag.value = true
+    })
+  },
+)
 </script>
 
 <script lang="ts">
@@ -30,6 +33,4 @@ export default {
 }
 </script>
 
-<style scoped lang="scss">
-
-</style>
+<style scoped lang="scss"></style>

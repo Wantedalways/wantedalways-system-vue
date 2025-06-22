@@ -6,9 +6,9 @@ import type {
   RoleQueryParams,
   SysUserRole,
   UserListForRoleParams,
-  UsersForRole
-} from "@/api/type";
-import {get, post} from "@/api/index";
+  UsersForRole,
+} from '@/api/type'
+import { get, post } from '@/api/index'
 
 enum Api {
   getRoleList = '/sys/role/list',
@@ -38,6 +38,7 @@ enum Api {
   validateDeleteDepart = '/sys/depart/validateDeleteDepart',
   deleteDepart = '/sys/depart/delete',
   dragDepart = '/sys/depart/drag',
+  getUserListByDepartId = '/sys/user/listByDepart',
 }
 
 /**
@@ -51,7 +52,7 @@ export function getRoleList(params: RoleQueryParams) {
  * 获取角色下拉框列表
  */
 export function getRoleSelectList(roleType: string) {
-  return get(Api.getRoleSelectList, {'roleType': roleType})
+  return get(Api.getRoleSelectList, { roleType: roleType })
 }
 
 /**
@@ -65,7 +66,7 @@ export function addRole(role: Role) {
  * 校验角色
  */
 export function validateRole(param: string, paramType: string) {
-  return get(Api.validateRole, {'validateParam': param, 'paramType': paramType})
+  return get(Api.validateRole, { validateParam: param, paramType: paramType })
 }
 
 /**
@@ -79,14 +80,14 @@ export function editRole(role: Role) {
  * 删除角色
  */
 export function deleteRole(id: string) {
-  return post(Api.deleteRole, {'id': id})
+  return post(Api.deleteRole, { id: id })
 }
 
 /**
  * 获取角色关联的权限id列表
  */
 export function getPermissionIdsByRole(id: string) {
-  return get(Api.getPermissionIdsByRole, {'roleId': id})
+  return get(Api.getPermissionIdsByRole, { roleId: id })
 }
 
 /**
@@ -121,7 +122,7 @@ export function getDepartTreeList() {
  * 获取用户树
  */
 export function getUserTreeList(parentId: string) {
-  return get(Api.getUserTreeList, {'parentId': parentId})
+  return get(Api.getUserTreeList, { parentId: parentId })
 }
 
 /**
@@ -149,21 +150,24 @@ export function removeUserFromRole(sysUserRole: SysUserRole) {
  * 获取附带部门的用户列表
  */
 export function getUserListWithDepart(realName: string) {
-  return get(Api.getUserListWithDepart, {'realName': realName})
+  return get(Api.getUserListWithDepart, { realName: realName })
 }
 
 /**
  * 获取权限列表（树状）
  */
 export function getPermissionListAsTree(serviceId: string, name: string) {
-  return get(Api.getPermissionListAsTree, {'serviceId': serviceId, 'name': name})
+  return get(Api.getPermissionListAsTree, { serviceId: serviceId, name: name })
 }
 
 /**
  * 校验权限
  */
 export function validatePermission(param: string, paramType: string) {
-  return get(Api.validatePermission, {'validateParam': param, 'paramType': paramType})
+  return get(Api.validatePermission, {
+    validateParam: param,
+    paramType: paramType,
+  })
 }
 
 /**
@@ -191,7 +195,7 @@ export function deletePermission(id: string) {
  * 校验部门
  */
 export function validateDepart(param: string, paramType: string) {
-  return get(Api.validateDepart, {'validateParam': param, 'paramType': paramType})
+  return get(Api.validateDepart, { validateParam: param, paramType: paramType })
 }
 
 /**
@@ -212,14 +216,14 @@ export function editDepart(depart: Depart) {
  * 删除部门前验证，是否存在子部门和成员
  */
 export function validateDeleteDepart(id: string) {
-  return get(Api.validateDeleteDepart, {'id': id})
+  return get(Api.validateDeleteDepart, { id: id })
 }
 
 /**
  * 删除部门
  */
 export function deleteDepart(id: string) {
-  return post(Api.deleteDepart+ '?id=' + id)
+  return post(Api.deleteDepart + '?id=' + id)
 }
 
 /**
@@ -229,5 +233,9 @@ export function dragDepart(data: any) {
   return post(Api.dragDepart, data)
 }
 
-
-
+/**
+ * 通过部门id获取用户列表
+ */
+export function getUserListByDepartId(params: any) {
+  return get(Api.getUserListByDepartId, params)
+}
