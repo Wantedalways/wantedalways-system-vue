@@ -1,4 +1,4 @@
-import { baseRoutes } from '@/router'
+import {baseRoutes} from '@/router'
 
 /**
  * 生成主页路由

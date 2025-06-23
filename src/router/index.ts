@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import {createRouter, createWebHistory} from 'vue-router'
 import LoginView from '@/views/login/LoginView.vue'
 import setupPermissionGuard from '@/router/guard/permission'
 

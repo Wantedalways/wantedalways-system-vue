@@ -1,4 +1,4 @@
-import { customRef, type Ref, unref } from 'vue'
+import {customRef, type Ref, unref} from 'vue'
 
 /**
  * 创建一个防抖的 ref

@@ -10,7 +10,7 @@
 
 <script setup lang="ts">
 import useAppStore from '@/stores/modules/app'
-import { nextTick, ref, watch } from 'vue'
+import {nextTick, ref, watch} from 'vue'
 
 const appStore = useAppStore()
 const flag = ref(true)

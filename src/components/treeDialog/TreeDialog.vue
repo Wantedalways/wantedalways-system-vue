@@ -44,8 +44,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { CloseBold, Management, UserFilled } from '@element-plus/icons-vue'
+import {computed, ref} from 'vue'
+import {CloseBold, Management, UserFilled} from '@element-plus/icons-vue'
 
 const props = defineProps([
   'visible',

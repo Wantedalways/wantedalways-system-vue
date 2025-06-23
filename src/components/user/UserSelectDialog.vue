@@ -62,12 +62,12 @@
 </template>
 
 <script setup lang="ts">
-import { Management, Search, Select, UserFilled } from '@element-plus/icons-vue'
+import {Management, Search, Select, UserFilled} from '@element-plus/icons-vue'
 import TreeDialog from '@/components/treeDialog/TreeDialog.vue'
-import { computed, onMounted, reactive, ref, watch } from 'vue'
-import { getUserListWithDepart, getUserTreeList } from '@/api/setting'
-import { ElMessage } from 'element-plus'
-import { useDebounceFn } from '@/utils/debounce'
+import {computed, onMounted, reactive, ref, watch} from 'vue'
+import {getUserListWithDepart, getUserTreeList} from '@/api/setting'
+import {ElMessage} from 'element-plus'
+import {useDebounceFn} from '@/utils/debounce'
 
 const props = defineProps(['visible', 'resultUsers', 'title'])
 const emit = defineEmits(['update:visible', 'update:resultUsers'])

@@ -32,7 +32,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import {computed, ref} from 'vue'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 
 const props = defineProps(['modelValue', 'visible'])

@@ -1,9 +1,9 @@
-import { defineStore } from 'pinia'
-import { accountLogin, logout } from '@/api/user'
+import {defineStore} from 'pinia'
+import {accountLogin, logout} from '@/api/user'
 import storage from '@/utils/storage'
-import { DATA_DICT, EXPIRE, KEY_TOKEN, USER_INFO } from '@/constant/cache'
-import type { LoginModel } from '@/stores/type'
-import { ElNotification } from 'element-plus'
+import {DATA_DICT, EXPIRE, KEY_TOKEN, USER_INFO} from '@/constant/cache'
+import type {LoginModel} from '@/stores/type'
+import {ElNotification} from 'element-plus'
 
 const useUserStore = defineStore('user', {
   state() {

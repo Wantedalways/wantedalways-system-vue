@@ -47,11 +47,11 @@
 
 <script setup lang="ts">
 import useAppStore from '@/stores/modules/app'
-import { useRoute, useRouter } from 'vue-router'
-import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import {useRoute, useRouter} from 'vue-router'
+import {computed, nextTick, onMounted, ref, watch} from 'vue'
 import usePermissionStore from '@/stores/modules/permission'
 import path from 'path-browserify'
-import { ElScrollbar } from 'element-plus'
+import {ElScrollbar} from 'element-plus'
 
 const appStore = useAppStore()
 const visitedTags = computed(() => appStore.visitedTags)

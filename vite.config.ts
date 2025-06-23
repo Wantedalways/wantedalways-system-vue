@@ -1,10 +1,10 @@
-import { fileURLToPath, URL } from 'node:url'
+import {fileURLToPath, URL} from 'node:url'
 
-import { defineConfig, loadEnv } from 'vite'
+import {defineConfig, loadEnv} from 'vite'
 import vue from '@vitejs/plugin-vue'
 
 // svg
-import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
+import {createSvgIconsPlugin} from 'vite-plugin-svg-icons'
 import path from 'path'
 
 // https://vite.dev/config/

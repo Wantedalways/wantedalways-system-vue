@@ -324,10 +324,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onActivated, reactive, ref, watch } from 'vue'
-import { getDict } from '@/utils'
-import { DICT_ROLE_TYPE } from '@/constant/cache'
-import { ArrowDown, Plus, Refresh, Search } from '@element-plus/icons-vue'
+import {computed, onActivated, reactive, ref, watch} from 'vue'
+import {getDict} from '@/utils'
+import {DICT_ROLE_TYPE} from '@/constant/cache'
+import {ArrowDown, Plus, Refresh, Search} from '@element-plus/icons-vue'
 import {
   addRole,
   deleteRole,
@@ -337,8 +337,8 @@ import {
   getRoleSelectList,
   validateRole,
 } from '@/api/setting'
-import { ElMessage, ElMessageBox, type FormRules } from 'element-plus'
-import type { Role } from '@/api/type'
+import {ElMessage, ElMessageBox, type FormRules} from 'element-plus'
+import type {Role} from '@/api/type'
 import PermissionDrawer from '@/components/permission/PermissionDrawer.vue'
 import UserDialog from '@/components/user/UserDialog.vue'
 

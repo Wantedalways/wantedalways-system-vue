@@ -32,7 +32,7 @@
 </template>
 
 <script setup lang="ts">
-import { getAssets } from '@/utils'
+import {getAssets} from '@/utils'
 import AccountLogin from '@/views/login/AccountLogin.vue'
 </script>
 

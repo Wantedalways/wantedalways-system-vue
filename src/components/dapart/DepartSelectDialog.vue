@@ -39,13 +39,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref, watch } from 'vue'
+import {computed, onMounted, reactive, ref, watch} from 'vue'
 import TreeDialog from '@/components/treeDialog/TreeDialog.vue'
-import { Management, Search, Select } from '@element-plus/icons-vue'
+import {Management, Search, Select} from '@element-plus/icons-vue'
 import storage from '@/utils/storage'
-import { DEPART_TREE } from '@/constant/cache'
-import { getDepartTreeList } from '@/api/setting'
-import { ElMessage } from 'element-plus'
+import {DEPART_TREE} from '@/constant/cache'
+import {getDepartTreeList} from '@/api/setting'
+import {ElMessage} from 'element-plus'
 
 const props = defineProps(['visible', 'resultDeparts', 'title'])
 const emit = defineEmits(['update:visible', 'update:resultDeparts'])

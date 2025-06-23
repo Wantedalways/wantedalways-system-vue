@@ -22,7 +22,7 @@
 </template>
 
 <script setup lang="ts">
-import { getAssets } from '@/utils'
+import {getAssets} from '@/utils'
 import ThemeSwitch from '@/layout/navbar/ThemeSwitch.vue'
 import NavProfile from '@/layout/navbar/NavProfile.vue'
 import NavBreadcrumb from '@/layout/navbar/NavBreadcrumb.vue'

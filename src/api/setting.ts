@@ -8,7 +8,7 @@ import type {
   UserListForRoleParams,
   UsersForRole,
 } from '@/api/type'
-import { get, post } from '@/api/index'
+import {get, post} from '@/api/index'
 
 enum Api {
   getRoleList = '/sys/role/list',
@@ -39,6 +39,7 @@ enum Api {
   deleteDepart = '/sys/depart/delete',
   dragDepart = '/sys/depart/drag',
   getUserListByDepartId = '/sys/user/listByDepart',
+  searchOrg = 'sys/depart/searchOrg',
 }
 
 /**
@@ -238,4 +239,11 @@ export function dragDepart(data: any) {
  */
 export function getUserListByDepartId(params: any) {
   return get(Api.getUserListByDepartId, params)
+}
+
+/**
+ * 搜索组织架构
+ */
+export function searchOrg(name: string) {
+  return get(Api.searchOrg, { 'name': name })
 }

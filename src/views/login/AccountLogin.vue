@@ -71,16 +71,16 @@
 </template>
 
 <script setup lang="ts">
-import { Finished, Key, User } from '@element-plus/icons-vue'
-import { getAssets } from '@/utils'
-import { onMounted, reactive, ref } from 'vue'
-import { getCaptcha } from '@/api/user'
-import { ElNotification, type FormRules } from 'element-plus'
-import type { LoginModel } from '@/stores/type'
+import {Finished, Key, User} from '@element-plus/icons-vue'
+import {getAssets} from '@/utils'
+import {onMounted, reactive, ref} from 'vue'
+import {getCaptcha} from '@/api/user'
+import {ElNotification, type FormRules} from 'element-plus'
+import type {LoginModel} from '@/stores/type'
 import useUserStore from '@/stores/modules/user'
-import { useRouter } from 'vue-router'
+import {useRouter} from 'vue-router'
 import storage from '@/utils/storage'
-import { USER_ACCOUNT } from '@/constant/cache'
+import {USER_ACCOUNT} from '@/constant/cache'
 
 // 验证码
 const isCaptchaSuccess = ref(false)

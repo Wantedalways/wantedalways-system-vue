@@ -1,6 +1,6 @@
 import storage from '@/utils/storage'
-import { DATA_DICT } from '@/constant/cache'
-import type { DictItem } from '@/utils/type/type'
+import {DATA_DICT} from '@/constant/cache'
+import type {DictItem} from '@/utils/type/type'
 
 /**
  * 获取assets中的静态资源

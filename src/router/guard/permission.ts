@@ -1,12 +1,12 @@
-import { type Router } from 'vue-router'
+import {type Router} from 'vue-router'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
-import { KEY_TOKEN } from '@/constant/cache'
+import {KEY_TOKEN} from '@/constant/cache'
 import storage from '@/utils/storage'
 import usePermissionStore from '@/stores/modules/permission'
-import { indexRoute } from '@/utils/router'
+import {indexRoute} from '@/utils/router'
 import useUserStore from '@/stores/modules/user'
-import { ElNotification } from 'element-plus'
+import {ElNotification} from 'element-plus'
 
 NProgress.configure({ showSpinner: false })
 

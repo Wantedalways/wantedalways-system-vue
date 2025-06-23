@@ -123,21 +123,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref, watch } from 'vue'
-import {
-  ArrowDown,
-  CircleClose,
-  Plus,
-  Refresh,
-  Search,
-} from '@element-plus/icons-vue'
-import {
-  addUsersForRole,
-  getUserListByRole,
-  removeUserFromRole,
-  removeUsersFromRole,
-} from '@/api/setting'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import {computed, reactive, ref, watch} from 'vue'
+import {ArrowDown, CircleClose, Plus, Refresh, Search,} from '@element-plus/icons-vue'
+import {addUsersForRole, getUserListByRole, removeUserFromRole, removeUsersFromRole,} from '@/api/setting'
+import {ElMessage, ElMessageBox} from 'element-plus'
 import DepartSelectDialog from '@/components/dapart/DepartSelectDialog.vue'
 import UserSelectDialog from '@/components/user/UserSelectDialog.vue'
 

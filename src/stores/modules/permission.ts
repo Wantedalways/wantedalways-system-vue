@@ -1,8 +1,8 @@
-import { defineStore } from 'pinia'
-import { getMenu } from '@/api/user'
-import { SERVICE_ID_SYSTEM } from '@/constant/api'
-import { ElNotification } from 'element-plus'
-import { constantRoutes } from '@/router'
+import {defineStore} from 'pinia'
+import {getMenu} from '@/api/user'
+import {SERVICE_ID_SYSTEM} from '@/constant/api'
+import {ElNotification} from 'element-plus'
+import {constantRoutes} from '@/router'
 
 const usePermissionStore = defineStore('permission', {
   state() {

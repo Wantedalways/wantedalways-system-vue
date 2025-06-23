@@ -13,7 +13,7 @@
 <script setup lang="ts">
 import SideBarItem from '@/layout/sidebar/SideBarItem.vue'
 import usePermissionStore from '@/stores/modules/permission'
-import { useRoute } from 'vue-router'
+import {useRoute} from 'vue-router'
 
 const permissionStore = usePermissionStore()
 const menuList = permissionStore.menuList

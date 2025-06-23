@@ -6,6 +6,7 @@
           :prefix-icon="Search"
           placeholder="搜索部门、用户"
           clearable
+          v-model="orgQueryParam"
         />
         <el-button
           :icon="Plus"
@@ -14,10 +15,10 @@
           @click="handleDepartAddButtonClick"
         />
       </div>
-      <div class="tab-wrapper">
+      <div class="tab-wrapper" v-show="!searchVisible">
         <el-radio-group v-model="tabValue" class="tab" size="small">
-          <el-radio-button label="部门" value="部门" class="tab-item" />
-          <el-radio-button label="用户组" value="用户组" class="tab-item" />
+          <el-radio-button label="部门" value="部门" class="tab-item"/>
+          <el-radio-button label="用户组" value="用户组" class="tab-item"/>
         </el-radio-group>
         <div v-show="tabValue === '部门'" class="depart-tab">
           <el-scrollbar class="depart-scrollbar">
@@ -43,7 +44,7 @@
                   @mouseleave="handleNodeMouseLeave"
                 >
                   <el-icon class="tree-node-icon">
-                    <Management />
+                    <Management/>
                   </el-icon>
                   <span class="tree-node-span">{{ data.label }}</span>
                   <el-popover
@@ -57,7 +58,7 @@
                   >
                     <template #reference>
                       <el-icon class="tree-node-icon-more">
-                        <MoreFilled />
+                        <MoreFilled/>
                       </el-icon>
                       -->
                     </template>
@@ -90,13 +91,53 @@
           </el-scrollbar>
         </div>
       </div>
+      <div v-show="searchVisible" v-loading="searchLoading" class="search-wrapper">
+        <div v-if="userQueryListData.length > 0" class="user-search">
+          <el-text class="search-title">用户</el-text>
+          <el-scrollbar>
+            <div v-for="item in userQueryListData" :key="item.id" class="selected-item">
+              <el-icon class="selected-icon">
+                <UserFilled/>
+              </el-icon>
+              <el-text class="selected-user">{{ item.realName }}</el-text>
+              <el-text class="selected-depart">{{
+                  item.departIds_dictText
+                }}
+              </el-text>
+            </div>
+          </el-scrollbar>
+        </div>
+        <div v-if="departQueryListData.length > 0" class="depart-search">
+          <el-text class="search-title">部门</el-text>
+          <el-scrollbar>
+            <div v-for="item in departQueryListData" :key="item.id" class="selected-item">
+              <el-icon class="selected-icon">
+                <Management/>
+              </el-icon>
+              <el-text class="selected-user">{{ item.departName }}</el-text>
+            </div>
+          </el-scrollbar>
+        </div>
+        <div v-if="groupQueryData.length > 0" class="group-search">
+          <el-text class="search-title">用户组</el-text>
+          <el-scrollbar>
+            <div v-for="item in groupQueryData" :key="item.id">
+              <el-icon class="selected-icon">
+                <Management/>
+              </el-icon>
+              <el-text class="selected-user">{{ item.name }}</el-text>
+            </div>
+          </el-scrollbar>
+        </div>
+      </div>
     </div>
     <div class="user-wrapper">
       <div class="user-title">{{ title }}</div>
       <div v-if="!userDetailFlag" class="user-list">
         <div class="user-button-group">
           <el-button type="primary" :icon="Plus" size="small"
-            >添加用户</el-button
+          >添加用户
+          </el-button
           >
           <el-button :icon="Delete" size="small">删除用户</el-button>
           <el-button
@@ -104,7 +145,8 @@
             :icon="Refresh"
             size="small"
             class="user-button-sync"
-            >同步企业微信</el-button
+          >同步企业微信
+          </el-button
           >
         </div>
         <div class="user-table">
@@ -122,7 +164,7 @@
             @sort-change="handleSort"
             :height="'calc(100vh - 280px)'"
           >
-            <el-table-column type="selection" fixed />
+            <el-table-column type="selection" fixed/>
             <el-table-column
               prop="realName"
               label="姓名"
@@ -134,10 +176,10 @@
               label="部门"
               width="180"
             />
-            <el-table-column prop="username" label="账号" />
-            <el-table-column prop="phone" label="手机" />
-            <el-table-column prop="email" label="邮箱" />
-            <el-table-column prop="gender_dictText" label="性别" />
+            <el-table-column prop="username" label="账号"/>
+            <el-table-column prop="phone" label="手机"/>
+            <el-table-column prop="email" label="邮箱"/>
+            <el-table-column prop="gender_dictText" label="性别"/>
             <el-table-column label="操作">
               <template #default="scope">
                 <el-button size="small" text type="primary">详情</el-button>
@@ -146,7 +188,7 @@
                   <el-button size="small" text type="info">
                     更多
                     <el-icon>
-                      <ArrowDown />
+                      <ArrowDown/>
                     </el-icon>
                   </el-button>
                   <template #dropdown>
@@ -157,7 +199,8 @@
                           size="small"
                           text
                           type="primary"
-                          >启用</el-button
+                        >启用
+                        </el-button
                         >
                         <el-button v-else text size="small">禁用</el-button>
                       </el-dropdown-item>
@@ -166,7 +209,8 @@
                       </el-dropdown-item>
                       <el-dropdown-item>
                         <el-button size="small" text type="danger"
-                          >删除</el-button
+                        >删除
+                        </el-button
                         >
                       </el-dropdown-item>
                     </el-dropdown-menu>
@@ -241,13 +285,15 @@
       <el-button
         class="depart-form-button"
         @click="departAddDialogVisible = false"
-        >取消</el-button
+      >取消
+      </el-button
       >
       <el-button
         class="depart-form-button"
         type="primary"
         @click="handleAddDepart"
-        >确认</el-button
+      >确认
+      </el-button
       >
     </template>
   </el-dialog>
@@ -291,31 +337,25 @@
       <el-button
         class="depart-form-button"
         @click="departEditDialogVisible = false"
-        >取消</el-button
+      >取消
+      </el-button
       >
       <el-button
         class="depart-form-button"
         type="primary"
         @click="handleEditDepart"
-        >确认</el-button
+      >确认
+      </el-button
       >
     </template>
   </el-dialog>
 </template>
 
 <script setup lang="ts">
-import {
-  ArrowDown,
-  Delete,
-  Management,
-  MoreFilled,
-  Plus,
-  Refresh,
-  Search,
-} from '@element-plus/icons-vue'
-import { computed, onMounted, reactive, ref, watch } from 'vue'
+import {ArrowDown, Delete, Management, MoreFilled, Plus, Refresh, Search, UserFilled,} from '@element-plus/icons-vue'
+import {computed, onMounted, reactive, ref, watch} from 'vue'
 import storage from '@/utils/storage'
-import { DEPART_TREE } from '@/constant/cache'
+import {DEPART_TREE} from '@/constant/cache'
 import {
   addDepart,
   deleteDepart,
@@ -323,18 +363,14 @@ import {
   editDepart,
   getDepartTreeList,
   getUserListByDepartId,
+  searchOrg,
   validateDeleteDepart,
   validateDepart,
 } from '@/api/setting'
-import {
-  ElMessage,
-  ElMessageBox,
-  ElTreeSelect,
-  type FormRules,
-} from 'element-plus'
-import type { Depart } from '@/api/type'
-import { useDebounceFn } from '@/utils/debounce'
-import type { NodeDropType } from 'element-plus/es/components/tree/src/tree.type'
+import {ElMessage, ElMessageBox, ElTreeSelect, type FormRules,} from 'element-plus'
+import type {Depart} from '@/api/type'
+import {useDebounceFn} from '@/utils/debounce'
+import type {NodeDropType} from 'element-plus/es/components/tree/src/tree.type'
 
 const departTreeData = reactive([])
 const defaultExpand = ref([])
@@ -439,8 +475,8 @@ function openEditDepartDialog(data) {
 }
 
 const departRules = reactive<FormRules<Depart>>({
-  departName: [{ validator: validateName, trigger: 'blur' }],
-  workWxId: [{ validator: validateWorkWxId, trigger: 'blur' }],
+  departName: [{validator: validateName, trigger: 'blur'}],
+  workWxId: [{validator: validateWorkWxId, trigger: 'blur'}],
 })
 
 async function validateName(rule: any, value: any, callback: any) {
@@ -613,7 +649,7 @@ async function getUserList() {
 }
 
 function handleSort(data: { column: any; prop: string; order: any }) {
-  const { prop, order } = data
+  const {prop, order} = data
   if (prop.indexOf('_dictText') !== -1) {
     userQueryParams.value.orderBy = prop.substring(0, prop.indexOf('_dictText'))
   } else {
@@ -623,6 +659,13 @@ function handleSort(data: { column: any; prop: string; order: any }) {
 
   getUserList()
 }
+
+const orgQueryParam = ref('')
+const userQueryListData = ref([])
+const departQueryListData = ref([])
+const groupQueryData = ref([])
+const searchVisible = ref(false)
+const searchLoading = ref(false)
 
 watch(departAddDialogVisible, value => {
   if (!value) {
@@ -646,6 +689,34 @@ watch(selectedDepartId, async value => {
   title.value += '(' + userResult.value.total + '人)'
 })
 
+watch(orgQueryParam, useDebounceFn(async value => {
+  const param = value.trim()
+  if (param) {
+    searchVisible.value = true
+    searchLoading.value = true
+
+    const result = await searchOrg(param)
+    if (result.success) {
+      userQueryListData.value = result.data.userList
+      departQueryListData.value = result.data.departList
+      groupQueryData.value = result.data.groupList
+      searchLoading.value = false
+    } else {
+      ElMessage.error(result.message)
+      userQueryListData.value = []
+      departQueryListData.value = []
+      groupQueryData.value = []
+      searchLoading.value = false
+    }
+  } else {
+    userQueryListData.value = []
+    departQueryListData.value = []
+    groupQueryData.value = []
+    searchVisible.value = false
+    searchLoading.value = false
+  }
+}))
+
 onMounted(async () => {
   await getDepartTree()
   defaultExpand.value = [departTreeData[0].id]
@@ -668,6 +739,7 @@ export default {
   .depart-wrapper {
     height: 100%;
     min-width: 260px;
+    max-width: 260px;
     background-color: #e6e8eb;
     display: flex;
     flex-direction: column;
@@ -727,6 +799,58 @@ export default {
             margin-right: 5px;
             transform: rotate(90deg);
           }
+        }
+      }
+    }
+
+    .search-wrapper {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      background: #e6e8eb;
+      margin: 0 16px;
+
+      .el-loading-mask {
+        background: #e6e8eb;
+      }
+
+      .search-title {
+        font-size: 16px;
+        color: var(--el-color-info-dark-2);
+      }
+
+      .user-search {
+        max-height: 300px;
+        margin-bottom: 20px;
+      }
+
+      .depart-search {
+        height: 200px;
+      }
+
+      .group-search {
+        height: 200px;
+      }
+
+      .selected-item {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        padding: 0 10px 7px 10px;
+        margin-right: 30px;
+        border-radius: 4px;
+
+        &:hover {
+          background-color: var(--el-color-primary-light-9);
+        }
+
+        .selected-icon {
+          margin-right: 5px;
+          color: var(--el-color-primary-dark-2);
+        }
+
+        .selected-user {
+          flex-grow: 1;
         }
       }
     }
@@ -808,6 +932,12 @@ export default {
     .tab-wrapper {
       .el-radio-button__inner {
         width: 115px;
+      }
+    }
+
+    .search-wrapper {
+      .el-loading-mask {
+        background: #e6e8eb;
       }
     }
   }

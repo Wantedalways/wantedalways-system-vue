@@ -1,15 +1,20 @@
 // vite.config.ts
-import { fileURLToPath, URL } from 'node:url'
+import {fileURLToPath, URL} from 'node:url'
 import {
   defineConfig,
   loadEnv,
 } from 'file:///E:/VueProjects/wantedalways-system-vue/node_modules/vite/dist/node/index.js'
 import vue from 'file:///E:/VueProjects/wantedalways-system-vue/node_modules/@vitejs/plugin-vue/dist/index.mjs'
-import { createSvgIconsPlugin } from 'file:///E:/VueProjects/wantedalways-system-vue/node_modules/vite-plugin-svg-icons/dist/index.mjs'
+import {
+  createSvgIconsPlugin
+} from 'file:///E:/VueProjects/wantedalways-system-vue/node_modules/vite-plugin-svg-icons/dist/index.mjs'
 import path from 'path'
 import AutoImport from 'file:///E:/VueProjects/wantedalways-system-vue/node_modules/unplugin-auto-import/dist/vite.js'
-import Components from 'file:///E:/VueProjects/wantedalways-system-vue/node_modules/unplugin-vue-components/dist/vite.js'
-import { ElementPlusResolver } from 'file:///E:/VueProjects/wantedalways-system-vue/node_modules/unplugin-vue-components/dist/resolvers.js'
+import Components
+  from 'file:///E:/VueProjects/wantedalways-system-vue/node_modules/unplugin-vue-components/dist/vite.js'
+import {
+  ElementPlusResolver
+} from 'file:///E:/VueProjects/wantedalways-system-vue/node_modules/unplugin-vue-components/dist/resolvers.js'
 import Icons from 'file:///E:/VueProjects/wantedalways-system-vue/node_modules/unplugin-icons/dist/vite.js'
 import IconsResolver from 'file:///E:/VueProjects/wantedalways-system-vue/node_modules/unplugin-icons/dist/resolver.js'
 

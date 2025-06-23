@@ -22,14 +22,9 @@
 </template>
 111911
 <script setup lang="ts">
-import {
-  Edit,
-  HomeFilled,
-  SwitchButton,
-  UserFilled,
-} from '@element-plus/icons-vue'
+import {Edit, HomeFilled, SwitchButton, UserFilled,} from '@element-plus/icons-vue'
 import useUserStore from '@/stores/modules/user'
-import { useRouter } from 'vue-router'
+import {useRouter} from 'vue-router'
 
 const userStore = useUserStore()
 const router = useRouter()

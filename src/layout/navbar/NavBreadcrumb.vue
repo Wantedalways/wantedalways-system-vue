@@ -14,8 +14,8 @@
 </template>
 
 <script setup lang="ts">
-import { useRoute, useRouter } from 'vue-router'
-import { onMounted, ref, watch } from 'vue'
+import {useRoute, useRouter} from 'vue-router'
+import {onMounted, ref, watch} from 'vue'
 
 const levelList = ref([])
 const route = useRoute()

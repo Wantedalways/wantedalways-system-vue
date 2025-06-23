@@ -355,15 +355,8 @@
 </template>
 
 <script setup lang="ts">
-import {
-  ArrowDown,
-  CircleClose,
-  MoreFilled,
-  Plus,
-  Refresh,
-  Search,
-} from '@element-plus/icons-vue'
-import { onActivated, reactive, ref, watch, watchEffect } from 'vue'
+import {ArrowDown, CircleClose, MoreFilled, Plus, Refresh, Search,} from '@element-plus/icons-vue'
+import {onActivated, reactive, ref, watch, watchEffect} from 'vue'
 import {
   addPermission,
   deletePermission,
@@ -372,14 +365,9 @@ import {
   getPermissionListAsTree,
   validatePermission,
 } from '@/api/setting'
-import {
-  ElMessage,
-  ElMessageBox,
-  ElTreeSelect,
-  type FormRules,
-} from 'element-plus'
-import { useDebounceFn } from '@/utils/debounce'
-import type { Permission } from '@/api/type'
+import {ElMessage, ElMessageBox, ElTreeSelect, type FormRules,} from 'element-plus'
+import {useDebounceFn} from '@/utils/debounce'
+import type {Permission} from '@/api/type'
 import IconPicker from '@/components/icon/IconPicker.vue'
 
 const permissionQueryParams = reactive({
