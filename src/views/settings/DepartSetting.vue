@@ -60,7 +60,6 @@
                       <el-icon class="tree-node-icon-more">
                         <MoreFilled/>
                       </el-icon>
-                      -->
                     </template>
                     <template #default>
                       <div class="depart-popover-content">
@@ -92,43 +91,43 @@
         </div>
       </div>
       <div v-show="searchVisible" v-loading="searchLoading" class="search-wrapper">
-        <div v-if="userQueryListData.length > 0" class="user-search">
-          <el-text class="search-title">用户</el-text>
-          <el-scrollbar>
+        <el-scrollbar>
+          <div v-if="userQueryListData.length > 0" class="user-search">
+            <div class="search-title">用户</div>
             <div v-for="item in userQueryListData" :key="item.id" class="selected-item">
               <el-icon class="selected-icon">
                 <UserFilled/>
               </el-icon>
               <el-text class="selected-user">{{ item.realName }}</el-text>
-              <el-text class="selected-depart">{{
+              <el-text class="selected-depart" truncated>{{
                   item.departIds_dictText
                 }}
               </el-text>
             </div>
-          </el-scrollbar>
-        </div>
-        <div v-if="departQueryListData.length > 0" class="depart-search">
-          <el-text class="search-title">部门</el-text>
-          <el-scrollbar>
-            <div v-for="item in departQueryListData" :key="item.id" class="selected-item">
-              <el-icon class="selected-icon">
-                <Management/>
-              </el-icon>
-              <el-text class="selected-user">{{ item.departName }}</el-text>
-            </div>
-          </el-scrollbar>
-        </div>
-        <div v-if="groupQueryData.length > 0" class="group-search">
-          <el-text class="search-title">用户组</el-text>
-          <el-scrollbar>
-            <div v-for="item in groupQueryData" :key="item.id">
-              <el-icon class="selected-icon">
-                <Management/>
-              </el-icon>
-              <el-text class="selected-user">{{ item.name }}</el-text>
-            </div>
-          </el-scrollbar>
-        </div>
+          </div>
+          <div v-if="departQueryListData.length > 0" class="depart-search">
+            <div class="search-title">部门</div>
+            <el-scrollbar>
+              <div v-for="item in departQueryListData" :key="item.id" class="selected-item">
+                <el-icon class="selected-icon">
+                  <Management/>
+                </el-icon>
+                <el-text class="selected-user">{{ item.departName }}</el-text>
+              </div>
+            </el-scrollbar>
+          </div>
+          <div v-if="groupQueryData.length > 0" class="group-search">
+            <div class="search-title">用户组</div>
+            <el-scrollbar>
+              <div v-for="item in groupQueryData" :key="item.id">
+                <el-icon class="selected-icon">
+                  <Management/>
+                </el-icon>
+                <el-text class="selected-user">{{ item.name }}</el-text>
+              </div>
+            </el-scrollbar>
+          </div>
+        </el-scrollbar>
       </div>
     </div>
     <div class="user-wrapper">
@@ -178,11 +177,11 @@
             />
             <el-table-column prop="username" label="账号"/>
             <el-table-column prop="phone" label="手机"/>
-            <el-table-column prop="email" label="邮箱"/>
+            <el-table-column prop="email" label="企业邮箱"/>
             <el-table-column prop="gender_dictText" label="性别"/>
             <el-table-column label="操作">
               <template #default="scope">
-                <el-button size="small" text type="primary">详情</el-button>
+                <el-button size="small" text type="primary" @click="handleDetail(scope.row.id)">详情</el-button>
                 <el-button size="small" text type="primary">编辑</el-button>
                 <el-dropdown class="button-more" trigger="click">
                   <el-button size="small" text type="info">
@@ -232,15 +231,63 @@
           />
         </div>
       </div>
-      <div v-else-if="!userDetailFlag" class="user-detail">
+      <div v-else-if="userDetailFlag" class="user-detail">
         <div class="user-button-group">
-          <el-button>返回</el-button>
-          <el-button>编辑</el-button>
-          <el-button>禁用</el-button>
-          <el-button>删除</el-button>
+          <el-button @click="handleBack" size="small" plain type="info" :icon="DArrowLeft">返回</el-button>
+          <el-button size="small" plain type="info" @click="handleEditUserFromDetail">编辑</el-button>
+          <el-button size="small" plain type="info">禁用</el-button>
+          <el-button size="small" plain type="info">删除</el-button>
         </div>
-        <div>
-          <h1>用户详情</h1>
+        <div class="user-info">
+          <el-skeleton animated :loading="userDetailLoading" :throttle="{ leading: 500, trailing: 500, initVal: true }"
+                       :rows="15">
+            <template #default>
+              <el-scrollbar>
+                <el-descriptions :title="userDetailData.userInfo.realName" direction="vertical" :column="2">
+                  <el-descriptions-item label="账号">
+                    {{ userDetailData.userInfo.username ? userDetailData.userInfo.username : '未设置' }}
+                  </el-descriptions-item>
+                  <el-descriptions-item label="企业邮箱">
+                    {{ userDetailData.userInfo.email ? userDetailData.userInfo.email : '未设置' }}
+                  </el-descriptions-item>
+                  <el-descriptions-item label="手机">
+                    {{ userDetailData.userInfo.phone ? userDetailData.userInfo.phone : '未设置' }}
+                  </el-descriptions-item>
+                  <el-descriptions-item label="座机">
+                    {{ userDetailData.userInfo.telephone ? userDetailData.userInfo.telephone : '未设置' }}
+                  </el-descriptions-item>
+                  <el-descriptions-item label="身份证号">
+                    {{ userDetailData.userInfo.idNumber ? userDetailData.userInfo.idNumber : '未设置' }}
+                  </el-descriptions-item>
+                </el-descriptions>
+                <el-divider/>
+                <el-descriptions :column="1" direction="vertical">
+                  <el-descriptions-item label="部门">
+                    <div v-if="userDetailData.departInfo.length > 0">
+                      <el-tag v-for="item in userDetailData.departInfo" :key="item.id">{{ item.departName }}</el-tag>
+                    </div>
+                    <span v-else>未设置</span>
+                  </el-descriptions-item>
+                  <el-descriptions-item label="用户组">
+                    <div v-if="userDetailData.groupInfo.length > 0">
+                      <el-tag v-for="item in userDetailData.groupInfo" :key="item.id">{{ item.name }}</el-tag>
+                    </div>
+                    <span v-else>未设置</span>
+                  </el-descriptions-item>
+                  <el-descriptions-item label="部门负责人">{{ userDetailData.orgInfo.isLeader ? '是' : '否' }}
+                  </el-descriptions-item>
+                  <el-descriptions-item label="负责部门">
+                    <div v-if="userDetailData.orgInfo.isLeader">
+                      <el-tag v-for="item in userDetailData.orgInfo.leadingDeparts" :key="item.id">
+                        {{ item.departName }}
+                      </el-tag>
+                    </div>
+                    <span v-else>未设置</span>
+                  </el-descriptions-item>
+                </el-descriptions>
+              </el-scrollbar>
+            </template>
+          </el-skeleton>
         </div>
       </div>
     </div>
@@ -349,10 +396,100 @@
       >
     </template>
   </el-dialog>
+
+  <el-dialog v-model="userEditDialogVisible" title="编辑用户信息">
+    <el-scrollbar>
+      <el-form :model="userDetailEditParam.userInfo">
+        <el-form-item label="姓名">
+          <el-input v-model="userDetailEditParam.userInfo.realName"/>
+        </el-form-item>
+        <el-form-item label="账号">
+          <el-input v-model="userDetailEditParam.userInfo.username"/>
+        </el-form-item>
+        <el-form-item label="性别">
+          <el-radio-group v-model="userDetailEditParam.userInfo.gender">
+            <el-radio value="1">男</el-radio>
+            <el-radio value="2">女</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="企业邮箱">
+          <el-input v-model="userDetailEditParam.userInfo.email"/>
+        </el-form-item>
+        <el-form-item label="手机">
+          <el-input v-model="userDetailEditParam.userInfo.phone"/>
+        </el-form-item>
+        <el-form-item label="座机">
+          <el-input v-model="userDetailEditParam.userInfo.telephone"/>
+        </el-form-item>
+        <el-form-item label="身份证号">
+          <el-input v-model="userDetailEditParam.userInfo.idNumber"/>
+        </el-form-item>
+      </el-form>
+      <el-divider/>
+      <el-descriptions :column="1" direction="vertical">
+        <el-descriptions-item label="部门">
+          <el-tag v-for="item in userDetailEditParam.departInfo" :key="item.id">
+            <template #default>
+              <el-icon>
+                <Management/>
+              </el-icon>
+              <span>{{ item.departName }}</span>
+              <span v-if="item.isMajor">主</span>
+              <el-popover
+                placement="bottom-start"
+                trigger="click"
+                :show-arrow="false"
+                popper-style="max-width: 100px"
+                popper-class="depart-popover"
+              >
+                <template #reference>
+                  <el-icon style="transform: rotate(90deg)">
+                    <MoreFilled/>
+                  </el-icon>
+                </template>
+                <template #default>
+                  <div class="depart-popover-content">
+                    <div
+                      class="depart-popover-item" @click="editRemoveDepart(item.id)"
+                    >
+                      删除
+                    </div>
+                    <div
+                      class="depart-popover-item" v-if="!item.isMajor"
+                    >
+                      设为主部门
+                    </div>
+                  </div>
+                </template>
+              </el-popover>
+            </template>
+          </el-tag>
+          <el-button text type="primary" size="small" @click="editModifyDepart">修改</el-button>
+        </el-descriptions-item>
+      </el-descriptions>
+    </el-scrollbar>
+  </el-dialog>
+
+  <depart-select-dialog
+    v-model:visible="departSelectVisible"
+    v-model:result-departs="resultDeparts"
+    :title="'选择部门'"
+    ref="departSelectRef"
+  />
 </template>
 
 <script setup lang="ts">
-import {ArrowDown, Delete, Management, MoreFilled, Plus, Refresh, Search, UserFilled,} from '@element-plus/icons-vue'
+import {
+  ArrowDown,
+  DArrowLeft,
+  Delete,
+  Management,
+  MoreFilled,
+  Plus,
+  Refresh,
+  Search,
+  UserFilled,
+} from '@element-plus/icons-vue'
 import {computed, onMounted, reactive, ref, watch} from 'vue'
 import storage from '@/utils/storage'
 import {DEPART_TREE} from '@/constant/cache'
@@ -361,7 +498,7 @@ import {
   deleteDepart,
   dragDepart,
   editDepart,
-  getDepartTreeList,
+  getDepartTreeList, getUserDetail,
   getUserListByDepartId,
   searchOrg,
   validateDeleteDepart,
@@ -371,6 +508,7 @@ import {ElMessage, ElMessageBox, ElTreeSelect, type FormRules,} from 'element-pl
 import type {Depart} from '@/api/type'
 import {useDebounceFn} from '@/utils/debounce'
 import type {NodeDropType} from 'element-plus/es/components/tree/src/tree.type'
+import DepartSelectDialog from "@/components/dapart/DepartSelectDialog.vue";
 
 const departTreeData = reactive([])
 const defaultExpand = ref([])
@@ -667,6 +805,89 @@ const groupQueryData = ref([])
 const searchVisible = ref(false)
 const searchLoading = ref(false)
 
+const userDetailLoading = ref(false)
+const userDetailData = reactive({
+  userInfo: {},
+  departInfo: [],
+  groupInfo: [],
+  orgInfo: {
+    isLeader: false,
+    leadingDeparts: []
+  }
+})
+const handleDetail = useDebounceFn(async (id: string) => {
+  userDetailLoading.value = true
+  title.value = '用户详情'
+  userDetailFlag.value = true
+
+  const result = await getUserDetail(id)
+  if (result.success) {
+    Object.assign(userDetailData, result.data)
+    userDetailLoading.value = false
+  } else {
+    ElMessage.error(result.message)
+  }
+})
+
+function handleBack() {
+  userDetailFlag.value = false
+}
+
+const userEditDialogVisible = ref(false)
+const userDetailAddParam = reactive({
+  userInfo: {},
+  departInfo: [],
+  groupInfo: [],
+  orgInfo: {
+    isLeader: false,
+    leadingDeparts: []
+  }
+})
+const userDetailEditParam = reactive({
+  userInfo: {},
+  departInfo: [],
+  groupInfo: [],
+  orgInfo: {
+    isLeader: false,
+    leadingDeparts: []
+  }
+})
+
+function handleEditUserFromDetail() {
+  Object.assign(userDetailEditParam, userDetailData)
+  userEditDialogVisible.value = true
+}
+
+function editRemoveDepart(id: string) {
+  userDetailEditParam.departInfo = userDetailEditParam.departInfo.filter(item => {
+    return item.id !== id
+  })
+}
+
+const departSelectVisible = ref(false)
+const resultDeparts = ref([])
+const departSelectFlag = ref('')
+
+function editModifyDepart() {
+  departSelectFlag.value = 'departEdit'
+  resultDeparts.value = userDetailEditParam.departInfo.map(item => {
+    const {departName, ...rest} = item
+    return {...rest, label: departName}
+  })
+  departSelectVisible.value = true
+}
+
+watch(departSelectVisible, value => {
+  if (!value) {
+    if (departSelectFlag.value === 'departEdit') {
+      userDetailEditParam.departInfo = resultDeparts.value.map(item => {
+        const {label, ...rest} = item
+        return {...rest, departName: label}
+      })
+    }
+  }
+})
+
 watch(departAddDialogVisible, value => {
   if (!value) {
     departAddParams.value = {
@@ -809,6 +1030,7 @@ export default {
       flex-direction: column;
       background: #e6e8eb;
       margin: 0 16px;
+      max-height: 700px;
 
       .el-loading-mask {
         background: #e6e8eb;
@@ -816,27 +1038,21 @@ export default {
 
       .search-title {
         font-size: 16px;
+        font-weight: 600;
         color: var(--el-color-info-dark-2);
+        margin-bottom: 8px;
+        padding-left: 5px;
       }
 
       .user-search {
-        max-height: 300px;
-        margin-bottom: 20px;
-      }
-
-      .depart-search {
-        height: 200px;
-      }
-
-      .group-search {
-        height: 200px;
+        margin-bottom: 5px;
       }
 
       .selected-item {
         cursor: pointer;
         display: flex;
         align-items: center;
-        padding: 0 10px 7px 10px;
+        padding: 3px 5px 4px 5px;
         margin-right: 30px;
         border-radius: 4px;
 
@@ -851,6 +1067,11 @@ export default {
 
         .selected-user {
           flex-grow: 1;
+        }
+
+        .selected-depart {
+          width: 100px;
+          text-align: right;
         }
       }
     }
@@ -890,6 +1111,25 @@ export default {
         .button-more {
           margin-left: 12px;
         }
+      }
+    }
+
+    .user-detail {
+      display: flex;
+      flex-direction: column;
+
+      .user-button-group {
+        margin-bottom: 5px;
+
+        .el-button {
+          width: 65px;
+        }
+      }
+
+      .user-info {
+        flex: 1;
+        padding-top: 20px;
+        border-top: 1px solid var(--el-menu-border-color);
       }
     }
   }
@@ -939,6 +1179,12 @@ export default {
       .el-loading-mask {
         background: #e6e8eb;
       }
+    }
+  }
+
+  .user-wrapper {
+    .el-descriptions__body {
+      background-color: #fafcff;
     }
   }
 }

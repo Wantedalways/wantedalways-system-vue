@@ -40,6 +40,7 @@ enum Api {
   dragDepart = '/sys/depart/drag',
   getUserListByDepartId = '/sys/user/listByDepart',
   searchOrg = 'sys/depart/searchOrg',
+  getUserDetail = '/sys/user/detail',
 }
 
 /**
@@ -246,4 +247,11 @@ export function getUserListByDepartId(params: any) {
  */
 export function searchOrg(name: string) {
   return get(Api.searchOrg, { 'name': name })
+}
+
+/**
+ * 获取用户详情
+ */
+export function getUserDetail(id: string) {
+  return get(Api.getUserDetail, { 'id' : id })
 }
