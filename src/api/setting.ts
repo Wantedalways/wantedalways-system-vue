@@ -41,6 +41,9 @@ enum Api {
   getUserListByDepartId = '/sys/user/listByDepart',
   searchOrg = 'sys/depart/searchOrg',
   getUserDetail = '/sys/user/detail',
+  getAllGroupList = '/sys/group/list',
+  validateUser = '/sys/user/validate',
+  editUser = '/sys/user/edit',
 }
 
 /**
@@ -254,4 +257,25 @@ export function searchOrg(name: string) {
  */
 export function getUserDetail(id: string) {
   return get(Api.getUserDetail, { 'id' : id })
+}
+
+/**
+ * 获取用户组列表
+ */
+export function getAllGroupList() {
+  return get(Api.getAllGroupList)
+}
+
+/**
+ * 校验用户
+ */
+export function validateUser(param: string, paramType: string) {
+  return get(Api.validateUser, { validateParam: param, paramType: paramType })
+}
+
+/**
+ * 修改用户
+ */
+export function editUser(data: any) {
+  return post(Api.editUser, data)
 }

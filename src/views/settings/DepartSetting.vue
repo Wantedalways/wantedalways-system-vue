@@ -344,7 +344,6 @@
       >
     </template>
   </el-dialog>
-
   <el-dialog v-model="departEditDialogVisible" title="修改部门" width="550">
     <el-form
       :model="departEditParams"
@@ -399,36 +398,36 @@
 
   <el-dialog v-model="userEditDialogVisible" title="编辑用户信息">
     <el-scrollbar>
-      <el-form :model="userDetailEditParam.userInfo">
-        <el-form-item label="姓名">
+      <el-form :model="userDetailEditParam.userInfo" :rules="userRules" ref="userEditFormRef">
+        <el-form-item label="姓名" prop="realName">
           <el-input v-model="userDetailEditParam.userInfo.realName"/>
         </el-form-item>
-        <el-form-item label="账号">
+        <el-form-item label="账号" prop="username">
           <el-input v-model="userDetailEditParam.userInfo.username"/>
         </el-form-item>
-        <el-form-item label="性别">
+        <el-form-item label="性别" prop="gender">
           <el-radio-group v-model="userDetailEditParam.userInfo.gender">
-            <el-radio value="1">男</el-radio>
-            <el-radio value="2">女</el-radio>
+            <el-radio :value="1">男</el-radio>
+            <el-radio :value="2">女</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="企业邮箱">
+        <el-form-item label="企业邮箱" prop="email">
           <el-input v-model="userDetailEditParam.userInfo.email"/>
         </el-form-item>
-        <el-form-item label="手机">
+        <el-form-item label="手机" prop="phone">
           <el-input v-model="userDetailEditParam.userInfo.phone"/>
         </el-form-item>
-        <el-form-item label="座机">
+        <el-form-item label="座机" prop="telephone">
           <el-input v-model="userDetailEditParam.userInfo.telephone"/>
         </el-form-item>
-        <el-form-item label="身份证号">
+        <el-form-item label="身份证号" prop="idNumber">
           <el-input v-model="userDetailEditParam.userInfo.idNumber"/>
         </el-form-item>
       </el-form>
       <el-divider/>
       <el-descriptions :column="1" direction="vertical">
         <el-descriptions-item label="部门">
-          <el-tag v-for="item in userDetailEditParam.departInfo" :key="item.id">
+          <el-tag v-for="item in userDetailEditParam.departInfo" :key="item.id" disable-transitions>
             <template #default>
               <el-icon>
                 <Management/>
@@ -466,21 +465,73 @@
           </el-tag>
           <el-button text type="primary" size="small" @click="editModifyDepart">修改</el-button>
         </el-descriptions-item>
+        <el-descriptions-item label="用户组">
+          <el-tag v-for="item in userDetailEditParam.groupInfo" :key="item.id" disable-transitions>{{
+              item.name
+            }}
+          </el-tag>
+          <el-button text type="primary" size="small" @click="editModifyGroup">修改</el-button>
+        </el-descriptions-item>
+        <el-descriptions-item label="部门负责人">
+          <el-radio-group v-model="userDetailEditParam.orgInfo.isLeader">
+            <el-radio :value="true">是</el-radio>
+            <el-radio :value="false">否</el-radio>
+          </el-radio-group>
+        </el-descriptions-item>
+        <el-descriptions-item label="负责部门" v-if="userDetailEditParam.orgInfo.isLeader">
+          <el-tag v-for="item in userDetailEditParam.orgInfo.leadingDeparts" :key="item.id" disable-transitions>
+            <template #default>
+              <el-icon>
+                <Management/>
+              </el-icon>
+              <span>{{ item.departName }}</span>
+              <el-icon>
+                <Close/>
+              </el-icon>
+            </template>
+          </el-tag>
+          <el-button text type="primary" size="small" @click="editModifyLeadingDepart">修改</el-button>
+        </el-descriptions-item>
       </el-descriptions>
     </el-scrollbar>
+    <template #footer>
+      <el-button
+        class="depart-form-button"
+        @click="userEditDialogVisible = false"
+      >取消
+      </el-button
+      >
+      <el-button
+        class="depart-form-button"
+        type="primary"
+        @click="handleUserEdit"
+      >确认
+      </el-button
+      >
+    </template>
+
+    <depart-select-dialog
+      v-model:visible="departEditSelectVisible"
+      v-model:result-departs="resultEditDeparts"
+      :title="'选择部门'"
+      ref="editDepartSelectRef"
+      :user-depart-flag="true"
+    />
+
+    <list-select-dialog v-model:visible="editLeadingDepartSelectVisible" v-model:resultList="editResultLeadingDeparts"
+                        :title="'选择部门'"
+                        :data-list="editLeadingDeparts" ref="editLeadingDepartSelectRef" :type="'部门'"/>
+
+    <list-select-dialog v-model:visible="editGroupSelectVisible" v-model:resultList="editResultGroups"
+                        :title="'选择部门'"
+                        :data-list="editGroups" ref="editGroupSelectRef" :type="'用户组'"/>
   </el-dialog>
 
-  <depart-select-dialog
-    v-model:visible="departSelectVisible"
-    v-model:result-departs="resultDeparts"
-    :title="'选择部门'"
-    ref="departSelectRef"
-  />
 </template>
 
 <script setup lang="ts">
 import {
-  ArrowDown,
+  ArrowDown, Close,
   DArrowLeft,
   Delete,
   Management,
@@ -490,25 +541,27 @@ import {
   Search,
   UserFilled,
 } from '@element-plus/icons-vue'
-import {computed, onMounted, reactive, ref, watch} from 'vue'
+import {computed, onMounted, reactive, ref, toRaw, watch} from 'vue'
 import storage from '@/utils/storage'
-import {DEPART_TREE} from '@/constant/cache'
+import {DEPART_TREE, USER_GROUP} from '@/constant/cache'
 import {
   addDepart,
   deleteDepart,
   dragDepart,
-  editDepart,
+  editDepart, editUser, getAllGroupList,
   getDepartTreeList, getUserDetail,
   getUserListByDepartId,
   searchOrg,
   validateDeleteDepart,
-  validateDepart,
+  validateDepart, validatePermission, validateUser,
 } from '@/api/setting'
 import {ElMessage, ElMessageBox, ElTreeSelect, type FormRules,} from 'element-plus'
-import type {Depart} from '@/api/type'
+import type {Depart, SysUser} from '@/api/type'
 import {useDebounceFn} from '@/utils/debounce'
 import type {NodeDropType} from 'element-plus/es/components/tree/src/tree.type'
 import DepartSelectDialog from "@/components/dapart/DepartSelectDialog.vue";
+import {cloneDeep} from 'lodash-es'
+import ListSelectDialog from "@/components/treeDialog/ListSelectDialog.vue";
 
 const departTreeData = reactive([])
 const defaultExpand = ref([])
@@ -852,9 +905,19 @@ const userDetailEditParam = reactive({
     leadingDeparts: []
   }
 })
+const userEditValidateParams = {
+  username: '',
+  email: '',
+  phone: '',
+  idNumber: ''
+}
 
 function handleEditUserFromDetail() {
-  Object.assign(userDetailEditParam, userDetailData)
+  Object.assign(userDetailEditParam, cloneDeep(userDetailData))
+  userEditValidateParams.username = userDetailData.userInfo.username
+  userEditValidateParams.email = userDetailData.userInfo.email
+  userEditValidateParams.phone = userDetailData.userInfo.phone
+  userEditValidateParams.idNumber = userDetailData.userInfo.idNumber
   userEditDialogVisible.value = true
 }
 
@@ -864,27 +927,194 @@ function editRemoveDepart(id: string) {
   })
 }
 
-const departSelectVisible = ref(false)
-const resultDeparts = ref([])
-const departSelectFlag = ref('')
+const departEditSelectVisible = ref(false)
+const resultEditDeparts = ref([])
+const editDepartSelectRef = ref()
 
 function editModifyDepart() {
-  departSelectFlag.value = 'departEdit'
-  resultDeparts.value = userDetailEditParam.departInfo.map(item => {
+  resultEditDeparts.value = userDetailEditParam.departInfo.map(item => {
     const {departName, ...rest} = item
     return {...rest, label: departName}
   })
-  departSelectVisible.value = true
+  departEditSelectVisible.value = true
 }
 
-watch(departSelectVisible, value => {
+watch(departEditSelectVisible, value => {
   if (!value) {
-    if (departSelectFlag.value === 'departEdit') {
-      userDetailEditParam.departInfo = resultDeparts.value.map(item => {
-        const {label, ...rest} = item
-        return {...rest, departName: label}
-      })
+    userDetailEditParam.departInfo = resultEditDeparts.value.map(item => {
+      const {label, ...rest} = item
+      return {...rest, departName: label}
+    })
+    resultEditDeparts.value = []
+    editDepartSelectRef.value.clear()
+  }
+})
+
+const editLeadingDepartSelectVisible = ref(false)
+const editResultLeadingDeparts = ref([])
+const editLeadingDeparts = ref([])
+const editLeadingDepartSelectRef = ref()
+
+function editModifyLeadingDepart() {
+  editLeadingDeparts.value = userDetailEditParam.departInfo.map(item => {
+    const {departName, ...rest} = item
+    return {...rest, label: departName}
+  })
+  editResultLeadingDeparts.value = userDetailEditParam.orgInfo.leadingDeparts.map(item => {
+    const {departName, ...rest} = item
+    return {...rest, label: departName}
+  })
+  editLeadingDepartSelectVisible.value = true
+}
+
+watch(editLeadingDepartSelectVisible, value => {
+  if (!value) {
+    userDetailEditParam.orgInfo.isLeader = editResultLeadingDeparts.value.length > 0
+    userDetailEditParam.orgInfo.leadingDeparts = editResultLeadingDeparts.value.map(item => {
+      const {label, ...rest} = item
+      return {...rest, departName: label}
+    })
+    console.log(userDetailEditParam.orgInfo.leadingDeparts)
+    editResultLeadingDeparts.value = []
+    editLeadingDepartSelectRef.value.clear()
+  }
+})
+
+const editGroupSelectVisible = ref(false)
+const editResultGroups = ref([])
+const editGroups = ref([])
+const editGroupSelectRef = ref()
+
+async function editModifyGroup() {
+  await getGroupList()
+  editGroupSelectVisible.value = true
+}
+
+async function getGroupList() {
+  if (storage.get(USER_GROUP)) {
+    editGroups.value = storage.get(USER_GROUP)
+  } else {
+    const result = await getAllGroupList()
+    if (result.success) {
+      editGroups.value = result.data
+      storage.set(USER_GROUP, result.data)
+    } else {
+      ElMessage.error(result.message)
     }
+  }
+}
+
+const userRules = reactive<FormRules<SysUser>>({
+  realName: [{required: true, message: '请输入姓名', trigger: 'blur'}],
+  username: [{validator: validateUsername, trigger: 'blur'}],
+  email: [{validator: validateEmail, trigger: 'blur'}],
+  phone: [{validator: validatePhone, trigger: 'blur'}],
+  idNumber: [{validator: validateIdNumber, trigger: 'blur'}],
+})
+
+async function validateUsername(rule: any, value: any, callback: any) {
+  if (value === '') {
+    callback(new Error('请输入账号'))
+  } else {
+    if (
+      userEditValidateParams.username === '' ||
+      userEditValidateParams.username !== userDetailEditParam.userInfo.username
+    ) {
+      const result = await validateUser(value, 'username')
+      if (!result.success) {
+        callback(new Error(result.message))
+      } else {
+        callback()
+      }
+    } else {
+      callback()
+    }
+  }
+}
+async function validateEmail(rule: any, value: any, callback: any) {
+  if (value === '') {
+    callback(new Error('请输入邮箱'))
+  } else {
+    if (
+      userEditValidateParams.email === '' ||
+      userEditValidateParams.email !== userDetailEditParam.userInfo.email
+    ) {
+      const result = await validateUser(value, 'email')
+      if (!result.success) {
+        callback(new Error(result.message))
+      } else {
+        callback()
+      }
+    } else {
+      callback()
+    }
+  }
+}
+async function validatePhone(rule: any, value: any, callback: any) {
+  if (value === '') {
+    callback(new Error('请输入手机号'))
+  } else {
+    if (
+      userEditValidateParams.phone === '' ||
+      userEditValidateParams.phone !== userDetailEditParam.userInfo.phone
+    ) {
+      const result = await validateUser(value, 'phone')
+      if (!result.success) {
+        callback(new Error(result.message))
+      } else {
+        callback()
+      }
+    } else {
+      callback()
+    }
+  }
+}
+async function validateIdNumber(rule: any, value: any, callback: any) {
+  if (
+    userEditValidateParams.idNumber === '' ||
+    userEditValidateParams.idNumber !== userDetailEditParam.userInfo.idNumber
+  ) {
+    const result = await validateUser(value, 'idNumber')
+    if (!result.success) {
+      callback(new Error(result.message))
+    } else {
+      callback()
+    }
+  } else {
+    callback()
+  }
+}
+const userEditFormRef = ref()
+const handleUserEdit = useDebounceFn(() => {
+  userEditFormRef.value.validate(async valid => {
+    if (valid) {
+      if (userDetailEditParam.departInfo.length === 0) {
+        ElMessage.error('请至少选择一个所属部门！')
+        return
+      }
+      if (userDetailEditParam.orgInfo.isLeader) {
+        if (userDetailEditParam.orgInfo.leadingDeparts.length === 0) {
+          ElMessage.error('请至少选择一个负责部门！')
+          return;
+        }
+      } else {
+        userDetailEditParam.orgInfo.leadingDeparts = []
+      }
+      const result = await editUser(userDetailEditParam)
+      if (result.success) {
+        ElMessage.success(result.message)
+        Object.assign(userDetailData, cloneDeep(userDetailEditParam))
+        userEditDialogVisible.value = false
+      } else {
+        ElMessage.error(result.message)
+      }
+    }
+  })
+})
+
+watch(userEditDialogVisible, value => {
+  if (!value) {
+    userEditFormRef.value.clearValidate()
   }
 })
 

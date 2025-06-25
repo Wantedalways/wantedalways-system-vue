@@ -11,5 +11,8 @@ export const DICT_ROLE_TYPE = 'role_type'
 export const USER_ACCOUNT = 'User_Account'
 // 部门树
 export const DEPART_TREE = 'Depart_Tree'
-// 部门树
+// 用户树
 export const USER_TREE = 'User_Tree'
+// 用户组列表
+export const USER_GROUP = 'User_Group'
+

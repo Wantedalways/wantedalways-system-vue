@@ -9,6 +9,7 @@
     draggable
     ref="dialogRef"
     align-center
+    @opened="emit('opened')"
   >
     <div class="body">
       <div class="tree-container">
@@ -21,15 +22,23 @@
             v-for="item in selectedItems"
             :key="item.id"
             class="selected-item"
+            @mouseenter="handleNodeMouseEnter(item.id)"
+            @mouseleave="handleNodeMouseLeave"
           >
             <el-icon class="selected-icon">
-              <Management v-if="!item.userFlag" />
-              <UserFilled v-if="item.userFlag" />
+              <Management v-if="!item.userFlag"/>
+              <UserFilled v-if="item.userFlag"/>
             </el-icon>
             <el-text class="selected-label">{{ item.label }}</el-text>
+            <el-text v-if="userDepartFlag && item.isMajor" type="info" size="small">主部门</el-text>
+            <el-text v-else-if="item.id === hoverNodeId && !item.isMajor" text type="primary" size="small"
+                     class="selected-set-major" @click="handleMajor(item.id)">设为主部门
+            </el-text>
             <el-icon @click="handleRemoveItem(item.id)" class="selected-close"
-              ><CloseBold
-            /></el-icon>
+            >
+              <CloseBold
+              />
+            </el-icon>
           </div>
         </el-scrollbar>
       </div>
@@ -37,7 +46,8 @@
     <div class="footer">
       <el-button @click="handleCancel" class="footer-button">取消</el-button>
       <el-button type="primary" @click="handleSave" class="footer-button"
-        >确认</el-button
+      >确认
+      </el-button
       >
     </div>
   </el-dialog>
@@ -53,11 +63,13 @@ const props = defineProps([
   'selectedItems',
   'resultItems',
   'type',
+  'userDepartFlag',
 ])
 const emit = defineEmits([
   'update:visible',
   'update:selectedItems',
   'update:resultItems',
+  'opened'
 ])
 const visible = computed({
   get() {
@@ -86,6 +98,7 @@ const resultItems = computed({
 })
 
 const isConfirm = ref(false)
+
 /**
  * 移除选择的节点
  */
@@ -102,6 +115,7 @@ function handleCancel() {
 }
 
 const dialogRef = ref()
+
 /**
  * 关闭
  */
@@ -129,6 +143,30 @@ function handleSave() {
   resultItems.value = [...selectedItems.value]
   isConfirm.value = true
   visible.value = false
+}
+
+const hoverNodeId = ref('')
+
+function handleNodeMouseEnter(id: string) {
+  hoverNodeId.value = id
+}
+
+function handleNodeMouseLeave() {
+  hoverNodeId.value = ''
+}
+
+/**
+ * 设置主部门
+ */
+function handleMajor(id: string) {
+  selectedItems.value.forEach(item => {
+    if (item.isMajor) {
+      item.isMajor = false
+    }
+    if (item.id === id) {
+      item.isMajor = true
+    }
+  })
 }
 </script>
 
@@ -174,8 +212,13 @@ export default {
             flex-grow: 1;
           }
 
+          .selected-set-major {
+            cursor: pointer;
+          }
+
           .selected-close {
             margin-right: 7px;
+            margin-left: 5px;
             cursor: pointer;
             border-radius: 5px;
 

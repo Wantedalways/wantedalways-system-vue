@@ -2,27 +2,25 @@
   <tree-dialog
     v-model:visible="visible"
     :title="title"
-    v-model:selected-items="selectedDepartItems"
-    v-model:result-items="resultDeparts"
-    :type="'部门'"
-    :user-depart-flag="userDepartFlag"
-    @opened="handleOpened"
+    v-model:selected-items="selectedItems"
+    v-model:result-items="resultList"
+    :type="type"
   >
     <div class="tree-wrapper">
       <el-input
-        v-model="departQueryParams"
+        v-model="queryParams"
         :prefix-icon="Search"
-        placeholder="搜索部门"
+        placeholder="搜索"
         class="search"
         clearable
       />
       <el-scrollbar class="tree-scrollbar">
         <el-tree
-          :data="departTreeData"
+          :data="treeData"
           node-key="id"
           :expand-on-click-node="false"
           @node-click="handleSelect"
-          ref="departTreeRef"
+          ref="treeRef"
           check-strictly
           :filter-node-method="treeFilter"
           :default-expanded-keys="defaultExpand"
@@ -31,7 +29,7 @@
             <el-icon class="tree-node-icon"><Management /></el-icon>
             <span>{{ data.label }}</span>
             <el-icon v-if="node.checked" class="checked-node"
-              ><Select
+            ><Select
             /></el-icon>
           </template>
         </el-tree>
@@ -41,7 +39,7 @@
 </template>
 
 <script setup lang="ts">
-import {computed, nextTick, onMounted, reactive, ref, watch} from 'vue'
+import {computed, onMounted, reactive, ref, watch} from 'vue'
 import TreeDialog from '@/components/treeDialog/TreeDialog.vue'
 import {Management, Search, Select} from '@element-plus/icons-vue'
 import storage from '@/utils/storage'
@@ -49,8 +47,8 @@ import {DEPART_TREE} from '@/constant/cache'
 import {getDepartTreeList} from '@/api/setting'
 import {ElMessage} from 'element-plus'
 
-const props = defineProps(['visible', 'resultDeparts', 'title', 'userDepartFlag'])
-const emit = defineEmits(['update:visible', 'update:resultDeparts'])
+const props = defineProps(['visible', 'resultList', 'title', 'dataList', 'type'])
+const emit = defineEmits(['update:visible', 'update:resultList'])
 const visible = computed({
   get() {
     return props.visible
@@ -60,62 +58,45 @@ const visible = computed({
   },
 })
 
-const resultDeparts = computed({
+const resultList = computed({
   get() {
-    return props.resultDeparts
+    return props.resultList
   },
   set(val) {
-    emit('update:resultDeparts', val)
+    emit('update:resultList', val)
   },
 })
 
-const departQueryParams = ref('')
-const departTreeData = reactive([])
-
-/**
- * 获取部门树
- */
-async function getDepartTree() {
-  if (storage.get(DEPART_TREE)) {
-    Object.assign(departTreeData, storage.get(DEPART_TREE))
-  } else {
-    const result = await getDepartTreeList()
-    if (result.success) {
-      Object.assign(departTreeData, result.data)
-      storage.set(DEPART_TREE, result.data)
-    } else {
-      ElMessage.error(result.message)
-    }
-  }
-}
-
-const selectedDepartItems = ref([])
+const queryParams = ref('')
+const treeData = computed(() => {
+  return props.dataList
+})
+const selectedItems = ref([])
 
 /**
  * 选择部门
  */
 function handleSelect(data) {
-  if (selectedDepartItems.value.includes(data)) {
-    selectedDepartItems.value = selectedDepartItems.value.filter(
+  if (selectedItems.value.includes(data)) {
+    selectedItems.value = selectedItems.value.filter(
       item => item.id !== data.id,
     )
   } else {
-    selectedDepartItems.value.push(data)
+    selectedItems.value.push(data)
   }
 }
 
-const departTreeRef = ref()
+const treeRef = ref()
 /**
  * 刷新选中状态
  */
 watch(
-  selectedDepartItems,
-  async value => {
-    // await nextTick()
-    if (departTreeRef.value) {
-      departTreeRef.value.setCheckedKeys([])
+  selectedItems,
+  value => {
+    if (treeRef.value) {
+      treeRef.value.setCheckedKeys([])
       value.forEach(item => {
-        departTreeRef.value.setChecked(item, true, false)
+        treeRef.value.setChecked(item, true, false)
       })
     }
   },
@@ -132,43 +113,35 @@ function treeFilter(value: string, data) {
   return data.label.includes(value)
 }
 
-watch(departQueryParams, value => {
-  departTreeRef.value.filter(value)
+watch(queryParams, value => {
+  treeRef.value.filter(value)
 })
 
 const defaultExpand = ref([])
 
-/*watch(visible, value => {
+watch(visible, value => {
   if (value) {
-    if (resultDeparts.value.length > 0) {
-      selectedDepartItems.value = [...resultDeparts.value]
+    if (resultList.value.length > 0) {
+      selectedItems.value = [...resultList.value]
     }
-    defaultExpand.value = [departTreeData[0].id]
   }
-})*/
-
-function handleOpened() {
-  if (resultDeparts.value.length > 0) {
-    selectedDepartItems.value = [...resultDeparts.value]
-  }
-  defaultExpand.value = [departTreeData[0].id]
-}
+})
 
 function clear() {
-  selectedDepartItems.value = []
+  selectedItems.value = []
 }
 
 defineExpose({
   clear,
 })
 onMounted(() => {
-  getDepartTree()
+
 })
 </script>
 
 <script lang="ts">
 export default {
-  name: 'DepartSelectDialog',
+  name: "ListSelectDialog",
 }
 </script>
 

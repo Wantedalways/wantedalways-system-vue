@@ -81,3 +81,14 @@ export interface Depart {
   departName: string,
   workWxId: string,
 }
+
+// 用户
+export interface SysUser {
+  realName: string,
+  username: string,
+  gender: number,
+  email: string,
+  phone: string,
+  telephone: string,
+  idNumber: string
+}
